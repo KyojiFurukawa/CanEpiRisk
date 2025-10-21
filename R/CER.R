@@ -142,7 +142,7 @@ mc_popLAR <- function( ds, riskmodel, reference, agexs, n_mcsamp=0 ){
 #--------------------------------------#
 # poppulation calculation              #
 #--------------------------------------#
-popLAR <- function( lars0, wgt, agedist, PER=100, agex ){     #    lars0 <- lars_inci_leukaemia_LQ_100; wgt=c(1,0)   # 表にまとめる
+popLAR <- function( lars0, wgt, agedist, PER=100, agex ){     #    lars0 <- lars_inci_leukaemia_LQ_100; wgt=c(1,0) 
   wlars0 <- list( male=NULL, female=NULL )
   wlars0 <- list(     male = wgt[1]*lars0$err$male   + wgt[2]*lars0$ear$male,
                       female = wgt[1]*lars0$err$female + wgt[2]*lars0$ear$female )
