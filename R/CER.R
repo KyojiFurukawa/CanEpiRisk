@@ -1,6 +1,6 @@
 #'Calculate the cumulative excess risk due to radiation exposure
 #'
-#'@param exposure exposure scenario (a list object, which contains age(s) at exposure (a single value or a vector), doseGy in Gy or Sv (a single value or a vector),
+#'@param exposure a list object, exposure scenario (a list object, which contains age(s) at exposure (a single value or a vector), doseGy in Gy or Sv (a single value or a vector),
 #'@param reference baseline rate and all cause mortality rate in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates in the reference population)
 #'@param riskmodel risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.
 #'@param option option for risk calculation (a list object, which contains maximum age to follow up (an integer value) )
@@ -142,7 +142,7 @@ mc_popLAR <- function( ds, riskmodel, reference, agexs, n_mcsamp=0 ){
 #--------------------------------------#
 # poppulation calculation              #
 #--------------------------------------#
-popLAR <- function( lars0, wgt, agedist, PER=100, agex ){     #    lars0 <- lars_inci_leukaemia_LQ_100; wgt=c(1,0) 
+popLAR <- function( lars0, wgt, agedist, PER=100, agex ){     #    lars0 <- lars_inci_leukaemia_LQ_100; wgt=c(1,0)
   wlars0 <- list( male=NULL, female=NULL )
   wlars0 <- list(     male = wgt[1]*lars0$err$male   + wgt[2]*lars0$ear$male,
                       female = wgt[1]*lars0$err$female + wgt[2]*lars0$ear$female )
