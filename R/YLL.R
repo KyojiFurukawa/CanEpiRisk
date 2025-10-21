@@ -1,28 +1,3 @@
-#'Calculate the years of life lost (YLL) due to radiation exposure
-#'
-#'@param exposure exposure scenario (a list object, which contains age(s) at exposure (a single value or a vector), doseGy in Gy or Sv (a single value or a vector),
-#'@param reference baseline rate and all cause mortality rate in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates in the reference population)
-#'@param riskmodel risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.
-#'@param option option for risk calculation (a list object, which contains maximum age to follow up (an integer value) )
-#'
-#'@return risk information(vector)
-#'
-#'@examples
-#'    # The following examples use default data provided in the CanEpiRisk package
-#'    # for riskmodel (LSS R14 all solid cancer model),
-#'    #     baseline (all solid cancer mortality rates in Japan 2018) and
-#'    #     mortality  (all cause mortality rates in Japan 2018)
-#'
-#'    # Cumulated excess risk for male exposed to 0.1 Gy at age 10
-#'    #  followed up to age 90 with err transfer
-#'    CER( agex=10, doseGy=0.1, sex=1, maxage=90 )
-#'
-#'    # Cumulated excess risk for female exposed to 0.01 Gy/year at ages 10-19
-#'    #  followed up to age 100 with 7:3 weights for ERR and EAR transfers
-#'    CER( agex=10:19, doseGy=rep(0.01,10), sex=2, maxage=100, wgt=c(.7,.3) )
-#'
-#'@importFrom MASS mvrnorm
-#'#'@export
 YLL <- function( exposure, reference, riskmodel, option )
 {
   # exposure=list( agex=5, doseGy=0.1, sex=1 ); riskmodel=LSS_mortality$allsolid$L; reference=list( baseline=mortality_Japan2018$allsolid, mortality=mortality_Japan2018$allcause ); option=list( mc_para=NULL, maxage=100, err_wgt=1, n_mcsamp=10000)
