@@ -4,16 +4,16 @@
 \alias{CER}
 \title{Calculate the cumulative excess risk due to radiation exposure}
 \usage{
-CER(exposure, reference, riskmodel, option, alpha = 0.05)
+CER(exposure, reference, riskmodel, option)
 }
 \arguments{
-\item{exposure}{a list object, exposure scenario (a list object, which contains age(s) at exposure (a single value or a vector), doseGy in Gy or Sv (a single value or a vector),}
+\item{exposure}{a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).}
 
-\item{reference}{baseline rate and all cause mortality rate in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates in the reference population)}
+\item{reference}{a list object that specifies the baseline information of the reference population, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.}
 
-\item{riskmodel}{risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.}
+\item{riskmodel}{a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates, a matrix 'var' for the variance covariance matrix, and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age)}
 
-\item{option}{option for risk calculation (a list object, which contains maximum age to follow up (an integer value) )}
+\item{option}{a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up, a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear), an integer value 'n_mcsamp' for the number of Monte Carlo samples, and alpha for the significance level (default=0.05)}
 }
 \value{
 risk information(vector)

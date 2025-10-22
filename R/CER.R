@@ -1,5 +1,46 @@
 #'Calculate the cumulative excess risk due to radiation exposure
 #'
+#'@param exposure a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).
+#'@param reference a list object that specifies the baseline information of the reference population, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.
+#'@param riskmodel a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates, a matrix 'var' for the variance covariance matrix, and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).
+#'@param option a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up, a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear), an integer value 'n_mcsamp' for the number of Monte Carlo samples, and alpha for the significance level (default=0.05).
+#'
+#'@return information of calculated risk (vector)
+#'
+#'@examples
+#'    # The following examples use default data provided in the CanEpiRisk package
+#'    # allsolid mortality, Region-1, male, 0.1Gy at age 5, LSS linear ERR
+#'
+#'    # Cumulated excess risk for male exposed to 0.1 Gy at age 10
+#'    #  followed up to age 90 with err transfer
+#'    CER( agex=10, doseGy=0.1, sex=1, maxage=90 )
+#'
+#'    # Cumulated excess risk for female exposed to 0.01 Gy/year at ages 10-19
+#'    #  followed up to age 100 with 7:3 weights for ERR and EAR transfers
+#'    CER( agex=10:19, doseGy=rep(0.01,10), sex=2, maxage=100, wgt=c(.7,.3) )
+#'
+#'@importFrom MASS mvrnorm
+#'#'@export
+CER <- function( exposure, reference, riskmodel, option )
+{
+  if( is.null(option$alpha) ) option$alpha <- 0.05  # alpha error (required to compute the confidence interval )
+  mle_CER  <- mc_CER(  exposure, reference, riskmodel, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
+  if( is.null( riskmodel$err$var )  ){   # in case of a riskmodel with a single err/ear parameter
+    rm <- riskmodel
+    rm$err$para <- rm$err$ci[1]; rm$ear$para <- rm$ear$ci[1]
+    loci_CER  <- mc_CER(  exposure, reference, rm, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
+    rm$err$para <- rm$err$ci[2]; rm$ear$para <- rm$ear$ci[2]
+    upci_CER  <- mc_CER(  exposure, reference, rm, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
+    res <- c( mle=mle_CER, mean=mle_CER, median=mle_CER, ci=c(loci_CER, upci_CER) )
+  } else {
+    samp_CER <- mc_CER(  exposure, reference, riskmodel, option )
+    res <- c( mle=mle_CER, mean=mean(samp_CER), median=median(samp_CER), ci=quantile(samp_CER,c(option$alpha/2,1-option$alpha/2)) )
+  }
+  res
+}
+
+#'Calculate the cumulative excess risk due to radiation exposure
+#'
 #'@param exposure a list object, exposure scenario (a list object, which contains age(s) at exposure (a single value or a vector), doseGy in Gy or Sv (a single value or a vector),
 #'@param reference baseline rate and all cause mortality rate in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates in the reference population)
 #'@param riskmodel risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.
@@ -23,22 +64,14 @@
 #'
 #'@importFrom MASS mvrnorm
 #'#'@export
-CER <- function( exposure, reference, riskmodel, option, alpha=0.05 )
-{
-  mle_CER  <- mc_CER(  exposure, reference, riskmodel, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
-  if( is.null( riskmodel$err$var )  ){   # in case of a riskmodel with a single err/ear parameter
-    rm <- riskmodel
-    rm$err$para <- rm$err$ci[1]; rm$ear$para <- rm$ear$ci[1]
-    loci_CER  <- mc_CER(  exposure, reference, rm, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
-    rm$err$para <- rm$err$ci[2]; rm$ear$para <- rm$ear$ci[2]
-    upci_CER  <- mc_CER(  exposure, reference, rm, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
-    res <- c( mle=mle_CER, mean=mle_CER, median=mle_CER, ci=c(loci_CER, upci_CER) )
-  } else {
-    samp_CER <- mc_CER(  exposure, reference, riskmodel, option )
-    res <- c( mle=mle_CER, mean=mean(samp_CER), median=median(samp_CER), ci=quantile(samp_CER,c(alpha/2,1-alpha/2)) )
-  }
-  res
+population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=100, nmc=10000 ){    # dsGy=0.1; reference=ref0; riskmodel=rm0
+  lars0 <- mc_popLAR( dsGy, riskmodel, reference, agexs=agex, n_mcsamp=nmc )
+  list( err=popLAR( lars0=lars0, wgt=c(1,0), agedist=reference$agedist, PER=PER, agex=agex ) ,
+        ear=popLAR( lars0=lars0, wgt=c(0,1), agedist=reference$agedist, PER=PER, agex=agex ) )
 }
+
+
+
 
 mc_CER <- function( exposure, reference, riskmodel, option )
 {
@@ -139,9 +172,7 @@ mc_popLAR <- function( ds, riskmodel, reference, agexs, n_mcsamp=0 ){
 }
 
 
-#--------------------------------------#
-# poppulation calculation              #
-#--------------------------------------#
+
 popLAR <- function( lars0, wgt, agedist, PER=100, agex ){     #    lars0 <- lars_inci_leukaemia_LQ_100; wgt=c(1,0)
   wlars0 <- list( male=NULL, female=NULL )
   wlars0 <- list(     male = wgt[1]*lars0$err$male   + wgt[2]*lars0$ear$male,
@@ -162,11 +193,6 @@ popLAR <- function( lars0, wgt, agedist, PER=100, agex ){     #    lars0 <- lars
   ret
 }
 
-population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=100, nmc=10000 ){    # dsGy=0.1; reference=ref0; riskmodel=rm0
-  lars0 <- mc_popLAR( dsGy, riskmodel, reference, agexs=agex, n_mcsamp=nmc )
-  list( err=popLAR( lars0=lars0, wgt=c(1,0), agedist=reference$agedist, PER=PER, agex=agex ) ,
-        ear=popLAR( lars0=lars0, wgt=c(0,1), agedist=reference$agedist, PER=PER, agex=agex ) )
-}
 
 
 
