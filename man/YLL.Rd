@@ -2,37 +2,36 @@
 % Please edit documentation in R/YLL.R
 \name{YLL}
 \alias{YLL}
-\title{Calculate the cumulative excess risk due to radiation exposure}
+\title{Calculate the years of life lost due to radiation exposure}
 \usage{
 YLL(exposure, reference, riskmodel, option)
 }
 \arguments{
-\item{exposure}{a list object, exposure scenario (a list object, which contains age(s) at exposure (a single value or a vector), doseGy in Gy or Sv (a single value or a vector),}
+\item{exposure}{a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).}
 
-\item{reference}{baseline rate and all cause mortality rate in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates in the reference population)}
+\item{reference}{a list object that specifies the baseline information of the reference population, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.}
 
-\item{riskmodel}{risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.}
+\item{riskmodel}{a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates, a matrix 'var' for the variance covariance matrix, and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).}
 
-\item{option}{option for risk calculation (a list object, which contains maximum age to follow up (an integer value) )}
+\item{option}{a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up, a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear), an integer value 'n_mcsamp' for the number of Monte Carlo samples, and alpha for the significance level (default=0.05).}
 }
 \value{
-risk information(vector)
+information of calculated risk (vector)
 }
 \description{
-Calculate the cumulative excess risk due to radiation exposure
+Calculate the years of life lost due to radiation exposure
 }
 \examples{
-   # The following examples use default data provided in the CanEpiRisk package
-   # for riskmodel (LSS R14 all solid cancer model),
-   #     baseline (all solid cancer mortality rates in Japan 2018) and
-   #     mortality  (all cause mortality rates in Japan 2018)
+ # The following examples use default data provided in CanEpiRisk package
+ # for riskmodels (LSS_mortality) derived from Life Span Study
+ # and baseline mortality rates for WHO global regions (Mortality)
 
-   # Cumulated excess risk for male exposed to 0.1 Gy at age 10
-   #  followed up to age 90 with err transfer
-   CER( agex=10, doseGy=0.1, sex=1, maxage=90 )
-
-   # Cumulated excess risk for female exposed to 0.01 Gy/year at ages 10-19
-   #  followed up to age 100 with 7:3 weights for ERR and EAR transfers
-   CER( agex=10:19, doseGy=rep(0.01,10), sex=2, maxage=100, wgt=c(.7,.3) )
+ # Example: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
+ exp1 <- list( agex=15, doseGy=0.1, sex=2 )   # exposure scenario
+ ref1 <- list( baseline=Mortality[[1]]$allsolid,     # baseline rates
+              mortality=Mortality[[1]]$allcause )    # all-cause mortality
+ mod1 <- LSS_mortality$allsolid$L
+ opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )
+ YLL(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 )   # YLL
 
 }

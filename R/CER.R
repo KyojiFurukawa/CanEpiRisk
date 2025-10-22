@@ -15,16 +15,16 @@
 #'  # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
 #'  exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
 #'  ref1 <- list( baseline=Mortality[[1]]$allsolid,     # baseline rates
-#'               mortality=Mortality[[1]]$allcause )    # allcause mortality
+#'               mortality=Mortality[[1]]$allcause )    # all-cause mortality
 #'  mod1 <- LSS_mortality$allsolid$L
 #'  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )
 #'  CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
 #'
 #'  # Example 2: leukaemia incidence, Region-4, male, 6.7(100/15)mGy at ages 30-45, followed up to age 60, LSS LQ EAR
 #'  exp2 <- list( agex=30:44+0.5, doseGy=rep(0.1/15,15), sex=1 )
-#'  ref2 <- list( baseline=Mortality[[4]]$leukaemia,    # baseline rates
+#'  ref2 <- list( baseline=Incidence[[4]]$leukaemia,    # baseline rates
 #'               mortality=Mortality[[4]]$allcause )    # all-cause mortality rates
-#'  mod2 <- LSS_mortality$allsolid$LQ
+#'  mod2 <- LSS_incidence$leukaemia$LQ
 #'  opt2 <- list( maxage=60, err_wgt=0, n_mcsamp=10000) # option
 #'  CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cases per 10,000
 #'
@@ -48,32 +48,39 @@ CER <- function( exposure, reference, riskmodel, option )
   res
 }
 
-#'Calculate the cumulative excess risk due to radiation exposure
+#'Calculate the population-averaged lifetime attributable risk due to radiation exposure
 #'
-#'@param exposure a list object, exposure scenario (a list object, which contains age(s) at exposure (a single value or a vector), doseGy in Gy or Sv (a single value or a vector),
-#'@param reference baseline rate and all cause mortality rate in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates in the reference population)
+#'@param dsGy radiation dose in Gy or Sv (a single value).
+#'@param reference baseline rate, all cause mortality rate and age distribution in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint, 'mortality' for all cause mortality rates and 'agedist' for age distribution in the reference population).
 #'@param riskmodel risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.
-#'@param option option for risk calculation (a list object, which contains maximum age to follow up (an integer value) )
+#'@param agex a vector of ages at exposure, which represent age categories (default values: 5, 15, 25, ..., 75 to represent age categories 0-10, 10-20, ..., 70-80) option for risk calculation (a list object, which contains maximum age to follow up (an integer value)
+#'@param PER  an integer (default value: 10000 to show the estimated risk as cases per 10000)
+#'@param mmc  an integer for the Monte Carlo sample size (default: 10000)
 #'
 #'@return risk information(vector)
 #'
 #'@examples
-#'    # The following examples use default data provided in the CanEpiRisk package
-#'    # for riskmodel (LSS R14 all solid cancer model),
-#'    #     baseline (all solid cancer mortality rates in Japan 2018) and
-#'    #     mortality  (all cause mortality rates in Japan 2018)
+#'  # The following examples use default data provided in CanEpiRisk package
+#'  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
+#'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence)
 #'
-#'    # Cumulated excess risk for male exposed to 0.1 Gy at age 10
-#'    #  followed up to age 90 with err transfer
-#'    CER( agex=10, doseGy=0.1, sex=1, maxage=90 )
+#'  # Example1: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
+#'  ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
+#'                mortality=Mortality[[1]]$allcause,     # allcause mortality
+#'                  agedist=agedist_rgn[[1]] )
+#'  mod1 <- LSS_mortality$allsolid$L
+#'  population_LAR( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # CER cases per 10,000
 #'
-#'    # Cumulated excess risk for female exposed to 0.01 Gy/year at ages 10-19
-#'    #  followed up to age 100 with 7:3 weights for ERR and EAR transfers
-#'    CER( agex=10:19, doseGy=rep(0.01,10), sex=2, maxage=100, wgt=c(.7,.3) )
+#'  # Example2: leukaemia incidence, Region-4, exposed to 0.1 Gy, followed up to age 100, LSS LQ ERR
+#'  ref2 <- list(  baseline=Incidence[[4]]$leukaemia,    # baseline rates
+#'                mortality=Mortality[[4]]$allcause,     # all-cause mortality
+#'                  agedist=agedist_rgn[[4]] )           # age distribution
+#'  mod2 <- LSS_incidence$leukaemia$LQ
+#'  population_LAR( dsGy=0.1, reference=ref2, riskmodel=mod2 )    # CER cases per 10,000
 #'
 #'@importFrom MASS mvrnorm
 #'@export
-population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=100, nmc=10000 ){    # dsGy=0.1; reference=ref0; riskmodel=rm0
+population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=10000, nmc=10000 ){
   lars0 <- mc_popLAR( dsGy, riskmodel, reference, agexs=agex, n_mcsamp=nmc )
   list( err=popLAR( lars0=lars0, wgt=c(1,0), agedist=reference$agedist, PER=PER, agex=agex ) ,
         ear=popLAR( lars0=lars0, wgt=c(0,1), agedist=reference$agedist, PER=PER, agex=agex ) )
@@ -179,7 +186,7 @@ mc_popLAR <- function( ds, riskmodel, reference, agexs, n_mcsamp=0 ){
 
 
 
-popLAR <- function( lars0, wgt, agedist, PER=100, agex ){     #    lars0 <- lars_inci_leukaemia_LQ_100; wgt=c(1,0)
+popLAR <- function( lars0, wgt, agedist, PER, agex ){     #    lars0 <- lars_inci_leukaemia_LQ_100; wgt=c(1,0)
   wlars0 <- list( male=NULL, female=NULL )
   wlars0 <- list(     male = wgt[1]*lars0$err$male   + wgt[2]*lars0$ear$male,
                       female = wgt[1]*lars0$err$female + wgt[2]*lars0$ear$female )

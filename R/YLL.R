@@ -12,13 +12,13 @@
 #'  # for riskmodels (LSS_mortality) derived from Life Span Study
 #'  # and baseline mortality rates for WHO global regions (Mortality)
 #'
-#'  # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
-#'  exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
+#'  # Example: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
+#'  exp1 <- list( agex=15, doseGy=0.1, sex=2 )   # exposure scenario
 #'  ref1 <- list( baseline=Mortality[[1]]$allsolid,     # baseline rates
-#'               mortality=Mortality[[1]]$allcause )    # allcause mortality
+#'               mortality=Mortality[[1]]$allcause )    # all-cause mortality
 #'  mod1 <- LSS_mortality$allsolid$L
 #'  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )
-#'  YLL(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
+#'  YLL(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 )   # YLL
 #'
 #'@importFrom MASS mvrnorm
 #'@export
@@ -29,6 +29,36 @@ YLL <- function( exposure, reference, riskmodel, option )
   mle_YLL  <- mc_YLL( exposure, reference, riskmodel, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt) )
   samp <- mc_YLL(  exposure, reference, riskmodel, option )
   c( mle=mle_YLL, mean=mean(samp), median=median(samp), ci=quantile(samp,c(option$alpha/2,1-option$alpha/2)) )
+}
+
+#'Calculate the population-averaged years of life lost due to radiation exposure
+#'
+#'@param dsGy radiation dose in Gy or Sv (a single value).
+#'@param reference baseline rate, all cause mortality rate and age distribution in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint, 'mortality' for all cause mortality rates and 'agedist' for age distribution in the reference population).
+#'@param riskmodel risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.
+#'@param agex a vector of ages at exposure, which represent age categories (default values: 5, 15, 25, ..., 75 to represent age categories 0-10, 10-20, ..., 70-80) option for risk calculation (a list object, which contains maximum age to follow up (an integer value)
+#'@param mmc  an integer for the Monte Carlo sample size (default: 10000)
+#'
+#'@return risk information(vector)
+#'
+#'@examples
+#'  # The following examples use default data provided in CanEpiRisk package
+#'  # for riskmodels (LSS_mortality) derived from Life Span Study
+#'  #     baseline rates and age distribution for WHO riskmodels (Mortality, agedist_rgn)
+#'
+#'  # Example: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
+#'  ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
+#'                mortality=Mortality[[1]]$allcause,     # allcause mortality
+#'                  agedist=agedist_rgn[[1]] )mod1 <- LSS_mortality$allsolid$L
+#'  population_YLL( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # YLL
+#'
+#'@importFrom MASS mvrnorm
+#'@export
+population_YLL <- function( dsGy, reference, riskmodel, agex=1:8*10-5, nmc=10000 ){
+  # dsGy=0.1; reference=ref0; riskmodel=rm0
+  lars0 <- mc_popYLL( dsGy, riskmodel, reference, agexs=agex, n_mcsamp=nmc )
+  list( err=popLAR( lars0=lars0, wgt=c(1,0), agedist=reference$agedist, PER=1, agex=agex ) ,
+        ear=popLAR( lars0=lars0, wgt=c(0,1), agedist=reference$agedist, PER=1, agex=agex ) )
 }
 
 
@@ -124,10 +154,4 @@ mc_popYLL <- function( ds, riskmodel, reference, agexs, n_mcsamp=0 ){
         ear=list(male=ylls_m_ear, female=ylls_f_ear)  )
 }
 
-population_YLL <- function( dsGy, reference, riskmodel, agex=1:8*10-5, nmc=10000 ){
-  # dsGy=0.1; reference=ref0; riskmodel=rm0
-  lars0 <- mc_popYLL( dsGy, riskmodel, reference, agexs=agex, n_mcsamp=nmc )
-  list( err=popLAR( lars0=lars0, wgt=c(1,0), agedist=reference$agedist, PER=1, agex=agex ) ,
-        ear=popLAR( lars0=lars0, wgt=c(0,1), agedist=reference$agedist, PER=1, agex=agex ) )
-}
 
