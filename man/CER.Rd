@@ -11,21 +11,19 @@ CER(exposure, reference, riskmodel, option)
 
 \item{reference}{a list object that specifies the baseline information of the reference population, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.}
 
-\item{riskmodel}{a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates, a matrix 'var' for the variance covariance matrix, and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age)}
+\item{riskmodel}{a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates, a matrix 'var' for the variance covariance matrix, and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).}
 
-\item{option}{a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up, a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear), an integer value 'n_mcsamp' for the number of Monte Carlo samples, and alpha for the significance level (default=0.05)}
+\item{option}{a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up, a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear), an integer value 'n_mcsamp' for the number of Monte Carlo samples, and alpha for the significance level (default=0.05).}
 }
 \value{
-risk information(vector)
+information of calculated risk (vector)
 }
 \description{
 Calculate the cumulative excess risk due to radiation exposure
 }
 \examples{
    # The following examples use default data provided in the CanEpiRisk package
-   # for riskmodel (LSS R14 all solid cancer model),
-   #     baseline (all solid cancer mortality rates in Japan 2018) and
-   #     mortality  (all cause mortality rates in Japan 2018)
+   # allsolid mortality, Region-1, male, 0.1Gy at age 5, LSS linear ERR
 
    # Cumulated excess risk for male exposed to 0.1 Gy at age 10
    #  followed up to age 90 with err transfer
