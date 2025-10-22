@@ -22,7 +22,7 @@
 #'    CER( agex=10:19, doseGy=rep(0.01,10), sex=2, maxage=100, wgt=c(.7,.3) )
 #'
 #'@importFrom MASS mvrnorm
-#'#'@export
+#'@export
 YLL <- function( exposure, reference, riskmodel, option )
 {
   # exposure=list( agex=5, doseGy=0.1, sex=1 ); riskmodel=LSS_mortality$allsolid$L; reference=list( baseline=mortality_Japan2018$allsolid, mortality=mortality_Japan2018$allcause ); option=list( mc_para=NULL, maxage=100, err_wgt=1, n_mcsamp=10000)

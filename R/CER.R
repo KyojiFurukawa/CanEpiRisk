@@ -25,7 +25,7 @@
 #'  CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cases per 10,000
 #'
 #'@importFrom MASS mvrnorm
-#'#'@export
+#'@export
 CER <- function( exposure, reference, riskmodel, option )
 {
   if( is.null(option$alpha) ) option$alpha <- 0.05  # alpha error (required to compute the confidence interval )
@@ -68,7 +68,7 @@ CER <- function( exposure, reference, riskmodel, option )
 #'    CER( agex=10:19, doseGy=rep(0.01,10), sex=2, maxage=100, wgt=c(.7,.3) )
 #'
 #'@importFrom MASS mvrnorm
-#'#'@export
+#'@export
 population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=100, nmc=10000 ){    # dsGy=0.1; reference=ref0; riskmodel=rm0
   lars0 <- mc_popLAR( dsGy, riskmodel, reference, agexs=agex, n_mcsamp=nmc )
   list( err=popLAR( lars0=lars0, wgt=c(1,0), agedist=reference$agedist, PER=PER, agex=agex ) ,
