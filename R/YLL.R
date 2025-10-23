@@ -1,4 +1,5 @@
-#'Calculate the years of life lost due to radiation exposure
+#'Calculating years of life lost due to radiation exposure
+#'@description Calculate the years of life lost due to radiation exposure.
 #'
 #'@param exposure a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).
 #'@param reference a list object that specifies the baseline information of the reference population, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.
@@ -16,7 +17,7 @@
 #'  exp1 <- list( agex=15, doseGy=0.1, sex=2 )   # exposure scenario
 #'  ref1 <- list( baseline=Mortality[[1]]$allsolid,     # baseline rates
 #'               mortality=Mortality[[1]]$allcause )    # all-cause mortality
-#'  mod1 <- LSS_mortality$allsolid$L
+#'  mod1 <- LSS_mortality$allsolid$L                    # risk model
 #'  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )
 #'  YLL(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 )   # YLL
 #'
@@ -31,7 +32,8 @@ YLL <- function( exposure, reference, riskmodel, option )
   c( mle=mle_YLL, mean=mean(samp), median=median(samp), ci=quantile(samp,c(option$alpha/2,1-option$alpha/2)) )
 }
 
-#'Calculate the population-averaged years of life lost due to radiation exposure
+#'Calculating population-averaged years of life lost
+#'@description Calculate the population-averaged years of life lost due to radiation exposure.
 #'
 #'@param dsGy radiation dose in Gy or Sv (a single value).
 #'@param reference baseline rate, all cause mortality rate and age distribution in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint, 'mortality' for all cause mortality rates and 'agedist' for age distribution in the reference population).
@@ -39,7 +41,7 @@ YLL <- function( exposure, reference, riskmodel, option )
 #'@param agex a vector of ages at exposure, which represent age categories (default values: 5, 15, 25, ..., 75 to represent age categories 0-10, 10-20, ..., 70-80) option for risk calculation (a list object, which contains maximum age to follow up (an integer value)
 #'@param mmc  an integer for the Monte Carlo sample size (default: 10000)
 #'
-#'@return risk information(vector)
+#'@return estimated risk information (list)
 #'
 #'@examples
 #'  # The following examples use default data provided in CanEpiRisk package
@@ -49,7 +51,8 @@ YLL <- function( exposure, reference, riskmodel, option )
 #'  # Example: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
 #'  ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
 #'                mortality=Mortality[[1]]$allcause,     # allcause mortality
-#'                  agedist=agedist_rgn[[1]] )mod1 <- LSS_mortality$allsolid$L
+#'                  agedist=agedist_rgn[[1]] )           # age distribution
+#'  mod1 <- LSS_mortality$allsolid$L                     # risk model
 #'  population_YLL( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # YLL
 #'
 #'@importFrom MASS mvrnorm

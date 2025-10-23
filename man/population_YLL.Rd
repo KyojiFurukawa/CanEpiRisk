@@ -2,7 +2,7 @@
 % Please edit documentation in R/YLL.R
 \name{population_YLL}
 \alias{population_YLL}
-\title{Calculate the population-averaged years of life lost due to radiation exposure}
+\title{Calculating population-averaged years of life lost}
 \usage{
 population_YLL(dsGy, reference, riskmodel, agex = 1:8 * 10 - 5, nmc = 10000)
 }
@@ -18,10 +18,10 @@ population_YLL(dsGy, reference, riskmodel, agex = 1:8 * 10 - 5, nmc = 10000)
 \item{mmc}{an integer for the Monte Carlo sample size (default: 10000)}
 }
 \value{
-risk information(vector)
+estimated risk information (list)
 }
 \description{
-Calculate the population-averaged years of life lost due to radiation exposure
+Calculate the population-averaged years of life lost due to radiation exposure.
 }
 \examples{
  # The following examples use default data provided in CanEpiRisk package
@@ -31,7 +31,8 @@ Calculate the population-averaged years of life lost due to radiation exposure
  # Example: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
  ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
                mortality=Mortality[[1]]$allcause,     # allcause mortality
-                 agedist=agedist_rgn[[1]] )mod1 <- LSS_mortality$allsolid$L
+                 agedist=agedist_rgn[[1]] )           # age distribution
+ mod1 <- LSS_mortality$allsolid$L                     # risk model
  population_YLL( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # YLL
 
 }

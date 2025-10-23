@@ -2,7 +2,7 @@
 % Please edit documentation in R/YLL.R
 \name{YLL}
 \alias{YLL}
-\title{Calculate the years of life lost due to radiation exposure}
+\title{Calculating years of life lost due to radiation exposure}
 \usage{
 YLL(exposure, reference, riskmodel, option)
 }
@@ -19,7 +19,7 @@ YLL(exposure, reference, riskmodel, option)
 information of calculated risk (vector)
 }
 \description{
-Calculate the years of life lost due to radiation exposure
+Calculate the years of life lost due to radiation exposure.
 }
 \examples{
  # The following examples use default data provided in CanEpiRisk package
@@ -30,7 +30,7 @@ Calculate the years of life lost due to radiation exposure
  exp1 <- list( agex=15, doseGy=0.1, sex=2 )   # exposure scenario
  ref1 <- list( baseline=Mortality[[1]]$allsolid,     # baseline rates
               mortality=Mortality[[1]]$allcause )    # all-cause mortality
- mod1 <- LSS_mortality$allsolid$L
+ mod1 <- LSS_mortality$allsolid$L                    # risk model
  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )
  YLL(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 )   # YLL
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/CER.R
 \name{population_LAR}
 \alias{population_LAR}
-\title{Calculate the population-averaged lifetime attributable risk due to radiation exposure}
+\title{Calculating population-averaged lifetime attributable risks}
 \usage{
 population_LAR(
   dsGy,
@@ -27,28 +27,28 @@ population_LAR(
 \item{mmc}{an integer for the Monte Carlo sample size (default: 10000)}
 }
 \value{
-risk information(vector)
+estimated risk information (list)
 }
 \description{
-Calculate the population-averaged lifetime attributable risk due to radiation exposure
+Calculate the population-averaged lifetime attributable risk due to radiation exposure.
 }
 \examples{
  # The following examples use default data provided in CanEpiRisk package
  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence)
 
- # Example1: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
+ # Example 1: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
  ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
                mortality=Mortality[[1]]$allcause,     # allcause mortality
-                 agedist=agedist_rgn[[1]] )
- mod1 <- LSS_mortality$allsolid$L
+                 agedist=agedist_rgn[[1]] )           # age distribution
+ mod1 <- LSS_mortality$allsolid$L                     # risk model
  population_LAR( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # CER cases per 10,000
 
- # Example2: leukaemia incidence, Region-4, exposed to 0.1 Gy, followed up to age 100, LSS LQ ERR
+ # Example 2: leukaemia incidence, Region-4, exposed to 0.1 Gy, followed up to age 100, LSS LQ ERR
  ref2 <- list(  baseline=Incidence[[4]]$leukaemia,    # baseline rates
                mortality=Mortality[[4]]$allcause,     # all-cause mortality
                  agedist=agedist_rgn[[4]] )           # age distribution
- mod2 <- LSS_incidence$leukaemia$LQ
+ mod2 <- LSS_incidence$leukaemia$LQ                   # risk model
  population_LAR( dsGy=0.1, reference=ref2, riskmodel=mod2 )    # CER cases per 10,000
 
 }

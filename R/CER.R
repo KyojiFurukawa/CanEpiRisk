@@ -1,4 +1,5 @@
-#'Calculate the cumulative excess risk due to radiation exposure
+#'Calculating cumulative excess risks
+#'@description Calculate the cumulative excess risk due to radiation exposure.
 #'
 #'@param exposure a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).
 #'@param reference a list object that specifies the baseline information of the reference population, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.
@@ -14,18 +15,18 @@
 #'
 #'  # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
 #'  exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
-#'  ref1 <- list( baseline=Mortality[[1]]$allsolid,     # baseline rates
-#'               mortality=Mortality[[1]]$allcause )    # all-cause mortality
-#'  mod1 <- LSS_mortality$allsolid$L
-#'  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )
+#'  ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
+#'               mortality=Mortality[[1]]$allcause )       # all-cause mortality
+#'  mod1 <- LSS_mortality$allsolid$L                       # risk model
+#'  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
 #'  CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
 #'
 #'  # Example 2: leukaemia incidence, Region-4, male, 6.7(100/15)mGy at ages 30-45, followed up to age 60, LSS LQ EAR
 #'  exp2 <- list( agex=30:44+0.5, doseGy=rep(0.1/15,15), sex=1 )
-#'  ref2 <- list( baseline=Incidence[[4]]$leukaemia,    # baseline rates
-#'               mortality=Mortality[[4]]$allcause )    # all-cause mortality rates
-#'  mod2 <- LSS_incidence$leukaemia$LQ
-#'  opt2 <- list( maxage=60, err_wgt=0, n_mcsamp=10000) # option
+#'  ref2 <- list( baseline=Incidence[[4]]$leukaemia,       # baseline rates
+#'               mortality=Mortality[[4]]$allcause )       # all-cause mortality rates
+#'  mod2 <- LSS_incidence$leukaemia$LQ                     # risk model
+#'  opt2 <- list( maxage=60, err_wgt=0, n_mcsamp=10000)    # option
 #'  CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cases per 10,000
 #'
 #'@importFrom MASS mvrnorm
@@ -48,7 +49,8 @@ CER <- function( exposure, reference, riskmodel, option )
   res
 }
 
-#'Calculate the population-averaged lifetime attributable risk due to radiation exposure
+#'Calculating population-averaged lifetime attributable risks
+#'@description Calculate the population-averaged lifetime attributable risk due to radiation exposure.
 #'
 #'@param dsGy radiation dose in Gy or Sv (a single value).
 #'@param reference baseline rate, all cause mortality rate and age distribution in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint, 'mortality' for all cause mortality rates and 'agedist' for age distribution in the reference population).
@@ -57,25 +59,25 @@ CER <- function( exposure, reference, riskmodel, option )
 #'@param PER  an integer (default value: 10000 to show the estimated risk as cases per 10000)
 #'@param mmc  an integer for the Monte Carlo sample size (default: 10000)
 #'
-#'@return risk information(vector)
+#'@return estimated risk information (list)
 #'
 #'@examples
 #'  # The following examples use default data provided in CanEpiRisk package
 #'  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
 #'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence)
 #'
-#'  # Example1: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
+#'  # Example 1: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
 #'  ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
 #'                mortality=Mortality[[1]]$allcause,     # allcause mortality
-#'                  agedist=agedist_rgn[[1]] )
-#'  mod1 <- LSS_mortality$allsolid$L
+#'                  agedist=agedist_rgn[[1]] )           # age distribution
+#'  mod1 <- LSS_mortality$allsolid$L                     # risk model
 #'  population_LAR( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # CER cases per 10,000
 #'
-#'  # Example2: leukaemia incidence, Region-4, exposed to 0.1 Gy, followed up to age 100, LSS LQ ERR
+#'  # Example 2: leukaemia incidence, Region-4, exposed to 0.1 Gy, followed up to age 100, LSS LQ ERR
 #'  ref2 <- list(  baseline=Incidence[[4]]$leukaemia,    # baseline rates
 #'                mortality=Mortality[[4]]$allcause,     # all-cause mortality
 #'                  agedist=agedist_rgn[[4]] )           # age distribution
-#'  mod2 <- LSS_incidence$leukaemia$LQ
+#'  mod2 <- LSS_incidence$leukaemia$LQ                   # risk model
 #'  population_LAR( dsGy=0.1, reference=ref2, riskmodel=mod2 )    # CER cases per 10,000
 #'
 #'@importFrom MASS mvrnorm
