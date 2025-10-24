@@ -28,12 +28,11 @@ The list object for each region contains the 18 site-specific cancer mortality r
 
 Each site-specific data.frame contains variables "age", "male" and "female".
 
-For "allcause" mortality data.frame contains person-year data "male_py" and "female_py" in addition to "age", "male" and "female".
+For "allcause" mortality data.frame contains age-specific person-year data, "male_py" and "female_py", in addition to "age", "male" and "female".
 }
 \examples{
- # The following examples use default data provided in CanEpiRisk package
- # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
- # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence)
+ names(Mortality)       # WHO global regions
+ names(Mortality[[1]])  # Sites for which baseline mortality rates are available
 
  # Example 1: All solid cancer mortality rates for Region-1
  Mortality[[1]]$allsolid

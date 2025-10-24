@@ -29,9 +29,9 @@ The list object for each region contains the 18 site-specific cancer mortality r
 Each site-specific data.frame contains variables "age", "male" and "female".
 }
 \examples{
- # The following examples use default data provided in CanEpiRisk package
- # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
- # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence)
+
+ names(Incidence)       # WHO global regions
+ names(Incidence[[1]])  # Sites for which baseline incidence rates are available
 
  # Example 1: All solid cancer incidence rates for Region-1
  Incidence[[1]]$allsolid
