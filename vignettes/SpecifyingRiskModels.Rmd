@@ -1,0 +1,205 @@
+---
+title: "Specifying risk models for CanEpiRisk package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SpecifyingRiskModels}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+To support the risk calculation process, we developed the CanEpiRisk package---a comprehensive R package designed to facilitate radiation-associated lifetime risk calculation for ionizing radiation exposure. This package incorporates functions for data input, transferring risk models (ERR, EAR), and calculating risk measures (CER and YLL), providing an interface for risk evaluations under various types of exposure scenarios across different populations. The CanEpiRisk package aims to streamline the analytical workflow, enhance reproducibility, and facilitate future extensions, including inverse odds weighting and other transportability methods. A detailed illustration of the package functionalities and example scripts will be included in the following.
+
+Any risk model can be used in **CanEpi** by specifying it in the defined form. As an example, the risk models derived from the INWORKS cohort for mortalities from all solid cancer (Richardson et al., 2015) and for leukaemia (Leuraud et al., 2015) can be specified as follows. Note that the uncertainty in the only risk model parameter (ERR/Gy) is specified by the 95% confidence interval, instead of the variance-covariance matrix in the LSS risk models objects.
+
+\`\`\`
+
+INWORKS_mortality \<- NULL
+
+INWORKS_mortality\$allsolid \<- NULL
+
+INWORKS_mortality\$allsolid\$L \<- list(
+
+err=list(
+
+para=c(0.47), \# ERR/Gy=0.47 (90% CI: 0.18,0.79)
+
+ci= c(0.1392403, 0.8521128), \# 95% CI coverted from 90%CI by Weibull approx.
+
+f=function (beta, data, lag=10) {
+
+beta[1] \* data\$dose \* (data\$age - data\$agex \>= lag )
+
+}
+
+),
+
+ear=list( \# dummry object
+
+para=c(4.8/10000),
+
+ci= c(0.1068428, 12.5703871)/10000,
+
+f=function (beta, data, lag=10) {
+
+beta[1] \* data\$dose \* (data\$age - data\$agex \>= lag )
+
+}
+
+)
+
+)
+
+INWORKS_mortality\$leukaemia\$L \<- list(
+
+err=list(
+
+para=c(2.96), \# ERR/Gy=2.96 (90% CI: 1.17, 5.21)
+
+ci= c(0.8664, 5.6940),
+
+f=function (beta, data, lag=2) {
+
+beta[1] \* data\$dose \* (data\$age - data\$agex \>= lag )
+
+}
+
+),
+
+ear=list( \# dummry object
+
+para=c(2.25/10000),
+
+var=NA,
+
+ci=c(0.5064054, 4.4914628)/10000,
+
+f=function (beta, data, lag=2) {
+
+beta[1] \* data\$dose \* (data\$age - data\$agex \>= lag )
+
+}
+
+)
+
+)
+
+\# plotting the age-varying excess risk under a chronic exposure scenario (Scenario 4)
+
+exp4 \<- list( agex=30:44+0.5, doseGy=rep(0.1/15,15), sex=1 )
+
+opt4_err \<- list( maxage=90, err_wgt=1 )
+
+lss_L \<- Comp_Exrisk( exposure=exp4, riskmodel=LSS_mortality\$allsolid\$L, option=opt4_err )
+
+lss_LQ \<- Comp_Exrisk( exposure=exp4, riskmodel=LSS_mortality\$allsolid\$LQ, option=opt4_err )
+
+inw_L \<- Comp_Exrisk( exposure=exp4, riskmodel=INWORKS_mortality\$allsolid\$L, option=opt4_err )
+
+plot( c(30,90), c(0,0.1), type="n", ylab="Excess relative rate", xlab="age (years)" )
+
+lines( lss_L, lty=2 )
+
+lines( lss_LQ, lty=3 )
+
+lines( inw_L )
+
+\`\`\`
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+INWORKS_mortality <- NULL
+
+INWORKS_mortality$allsolid <- NULL
+
+INWORKS_mortality$allsolid$L <- list(
+
+     err=list(
+
+       para=c(0.47),                  # ERR/Gy=0.47 (90% CI: 0.18,0.79)  
+
+       ci= c(0.1392403, 0.8521128),   #  95% CI coverted from 90%CI by Weibull approx.
+
+       f=function (beta, data, lag=10) {
+
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+
+       }
+
+       ),
+
+      ear=list(    # dummry object
+
+       para=c(4.8/10000),
+
+       ci= c(0.1068428, 12.5703871)/10000,
+
+       f=function (beta, data, lag=10) {
+
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+
+       } 
+
+       )
+
+  )
+
+INWORKS_mortality$leukaemia$L <- list(
+
+     err=list(
+
+       para=c(2.96),                         # ERR/Gy=2.96 (90% CI: 1.17, 5.21) 
+
+       ci= c(0.8664, 5.6940),
+
+       f=function (beta, data, lag=2) {
+
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+
+       }
+
+       ),
+
+      ear=list(    # dummry object
+
+       para=c(2.25/10000),
+
+       var=NA,
+
+       ci=c(0.5064054, 4.4914628)/10000,
+
+       f=function (beta, data, lag=2) {
+
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+
+       } 
+
+       )
+
+  )
+
+              # plotting the age-varying excess risk under a chronic exposure scenario (Scenario 4)
+
+exp4 <- list( agex=30:44+0.5, doseGy=rep(0.1/15,15), sex=1 )
+
+opt4_err <- list( maxage=90, err_wgt=1 ) 
+
+lss_L  <- Comp_Exrisk( exposure=exp4, riskmodel=LSS_mortality$allsolid$L,  option=opt4_err )
+
+lss_LQ <- Comp_Exrisk( exposure=exp4, riskmodel=LSS_mortality$allsolid$LQ, option=opt4_err )
+
+inw_L  <- Comp_Exrisk( exposure=exp4, riskmodel=INWORKS_mortality$allsolid$L, option=opt4_err )
+
+plot( c(30,90), c(0,0.1), type="n", ylab="Excess relative rate", xlab="age (years)" )
+
+lines( lss_L, lty=2 )
+
+lines( lss_LQ, lty=3 )
+
+lines( inw_L )
+```

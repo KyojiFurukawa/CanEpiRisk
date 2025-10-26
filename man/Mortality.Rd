@@ -49,5 +49,7 @@ For "allcause" mortality data.frame contains age-specific person-year data, "mal
 }
 \seealso{
 [Incidence], [plot_refdata()]
+
+[dplyr::filter()] for filtering data frames.
 }
 \keyword{datasets}

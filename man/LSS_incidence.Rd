@@ -56,7 +56,27 @@ Each site-specific a list object contains information for the risk model (a vect
 
 }
 \references{
-Ozasa, K., Y. Shimizu, A. Suyama et al. Studies of the mortality of atomic bomb survivors, Report 14, 1950-2003: an overview of cancer and noncancer diseases. Radiat Res 177(3): 229-243 (2012).
+Grant, E.J., A. Brenner, H. Sugiyama et al. Solid Cancer Incidence among the Life Span Study of Atomic Bomb Survivors: 1958-2009. Radiat Res 187(5): 513-537 (2017).
+
+Hsu, W.L., D.L. Preston, M. Soda et al. The incidence of leukemia, lymphoma and multiple myeloma among atomic bomb survivors: 1950-2001. Radiat Res 179(3): 361-382 (2013).
+
+Sakata, R., D.L. Preston, A.V. Brenner et al. Radiation-Related risk of cancers of the upper digestive tract among Japanese atomic bomb survivors. Radiat Res 192(3): 331-344 (2019).
+
+Sadakane, A., B. French, A.V. Brenner et al. Radiation and Risk of Liver, Biliary Tract, and Pancreatic Cancers among Atomic Bomb Survivors in Hiroshima and Nagasaki: 1958-2009. Radiat Res 192(3): 299-310 (2019).
+
+Sugiyama, H., M. Misumi, A. Brenner et al. Radiation risk of incident colorectal cancer by anatomical site among atomic bomb survivors: 1958-2009. Int J Cancer 146(3): 635-645 (2020).
+
+Sugiyama, H., M. Misumi, M. Kishikawa et al. Skin cancer incidence among atomic bomb survivors from 1958 to 1996. Radiat Res 181(5): 531-539 (2014).
+
+Brenner, A.V., D.L. Preston, R. Sakata et al. Incidence of Breast Cancer in the Life Span Study of Atomic Bomb Survivors: 1958-2009. Radiat Res 190(4): 433-444 (2018).
+
+Grant, E.J., M. Yamamura, A.V. Brenner et al. Radiation Risks for the Incidence of Kidney, Bladder and Other Urinary Tract Cancers: 1958-2009. Radiat Res 195(2): 140-148 (2021).
+
+Mabuchi, K., D.L. Preston, A.V. Brenner et al. Risk of Prostate Cancer Incidence among Atomic Bomb Survivors: 1958-2009. Radiat Res 195(1): 66-76 (2021).
+
+Furukawa, K., D. Preston, S. Funamoto et al. Long-term trend of thyroid cancer risk among Japanese atomic-bomb survivors: 60 years after exposure. Int J Cancer 132(5): 1222-1226 (2013).
+
+Brenner, A.V., H. Sugiyama, D.L. Preston et al. Radiation risk of central nervous system tumors in the Life Span Study of atomic bomb survivors, 1958-2009. Eur J Epidemiol 35(6): 591-600 (2020).
 }
 \seealso{
 [LSS_mortality], [plot_riskmodel()]
