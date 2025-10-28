@@ -24,7 +24,7 @@ Calculate the cumulative excess risk due to radiation exposure.
 \examples{
  # The following examples use default data provided in CanEpiRisk package
  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
- # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence)
+ # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
 
  # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
  exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario

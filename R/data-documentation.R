@@ -148,7 +148,7 @@
 #' }
 #' @details The list object for each risk model contains the 13 site-specific cancer incidence risk models derived from Life Span Study ("leukaemia", "esophagus", "stomach", "colon", "liver", "lung", "prostate", "pancreas", "bladder", "breast", "thyroid", "brainCNS").
 #'
-#' Each site-specific a list object contains information for the risk model (a vector of parameter estimates "para", a matrix of variance-covariance matrix of parameter estimates "var" and a function to calculate the risk "f").
+#' Each site-specific list object contains information for the risk model (a vector of parameter estimates "para", a matrix of variance-covariance matrix of parameter estimates "var" and a function to calculate the risk "f").
 #'
 #' @examples
 #'  names(LSS_incidence)   # Sites for which LSS incidence risk models are available
@@ -159,8 +159,8 @@
 #'  LSS_incidence$leukaemia$LQ$err   # Linear-quadratic ERR model for leukaemia incidence
 #'  LSS_incidence$lung$L$err         # Linear ERR model for thyroid cancer incidence
 #'
-#'  # Plotting LSS all solid cancer mortality risk model
-#'  plot_riskmodel( rm=LSS_incidence$allsolid$L, title="LSS all solid cancer mortality, Linear",  leg_pos=c(0.4, 0.95) )
+#'  # Plotting LSS all solid cancer incidence risk model
+#'  plot_riskmodel( rm=LSS_incidence$allsolid$L, title="LSS all solid cancer incidence, Linear",  leg_pos=c(0.4, 0.95) )
 #'
 #'  # Plotting LSS Leukaemia incidence risk model
 #'  plot_riskmodel( rm=LSS_incidence$leukaemia$LQ, title="LSS leukaemia incidence", ymax=c(1.5, .3), add=c(0.01,0) )

@@ -24,7 +24,7 @@ Calculate the years of life lost due to radiation exposure.
 \examples{
  # The following examples use default data provided in CanEpiRisk package
  # for riskmodels (LSS_mortality) derived from Life Span Study
- # and baseline mortality rates for WHO global regions (Mortality)
+ # and baseline mortality rates for WHO global regions (Mortality).
 
  # Example: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
  exp1 <- list( agex=15, doseGy=0.1, sex=2 )   # exposure scenario

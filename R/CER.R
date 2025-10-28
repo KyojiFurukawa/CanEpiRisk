@@ -90,6 +90,48 @@ population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=10000
         ear=popLAR( lars0=lars0, wgt=c(0,1), agedist=reference$agedist, PER=PER, agex=agex ) )
 }
 
+
+#'Calculating excess risks
+#'@description Calculate the excess risk from a risk model under a specified exposure scenario.
+#'
+#'@param exposure a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).
+#'@param riskmodel a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).
+#'@param option a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up and a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear).
+#'@param per an integer value for the risk denominator (default=1).
+#'@return information of calculated excess risk (data.frame)
+#'
+#'@examples
+#'  # The following examples use default data provided in CanEpiRisk package
+#'  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
+#'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
+#'
+#'  # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
+#'  exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
+#'  ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
+#'               mortality=Mortality[[1]]$allcause )       # all-cause mortality
+#'  mod1 <- LSS_mortality$allsolid$L                       # risk model
+#'  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
+#'  CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
+#'
+#'
+#'@seealso \link{LSS_mortality}, \link{LSS_incidence}
+#'@export
+Comp_Exrisk <- function( exposure, riskmodel, option, per=1 ){
+  ages <- ceiling(exposure$agex[1]):option$maxage
+  nexp <- length(exposure$agex)
+  rm <- riskmodel$err
+  if( option$err_wgt==0 ) rm <- riskmodel$ear
+  a <- sapply(1:nexp, function(i)
+    rm$f( rm$para, data.frame(dose=exposure$doseGy[i], agex=exposure$agex[i],
+                              age=ages-0.5, sex=exposure$sex) ) )
+  b <- apply( a, 1, sum )
+  data.frame( age=ages, risk=b*per )
+}
+
+
+
+
+
 mc_CER <- function( exposure, reference, riskmodel, option )
 {
   #   exposure=exposure0; reference=reference0; riskmodel=riskmodel0; option=option0
@@ -118,19 +160,6 @@ mc_CER <- function( exposure, reference, riskmodel, option )
 
     }
   }
-
-  # S_t <- survp/survp[min(exposure$agex) + 1]
-  # S_t[S_t>1] <- 0
-  # send.table.to.excel( data.frame( ages-1, ages, ages-0.5, brate, mrate, survp, err, brate*err, S_t,  brate*err*S_t) )
-
-  #  par( mfrow=c(1, 5 ) )
-  #  plot( ages, brate, type="l", xlab="age" )
-  #  plot( ages[ages>5], err[ages>5], type="l", xlim=c(0,100), xlab="age" )
-  #  plot( ages[ages>5], (brate*err)[ages>5], type="l", xlim=c(0,100), xlab="age" )
-  #  plot( ages[ages>5], S_t[ages>5], type="l", xlim=c(0,100), xlab="age" )
-  #  plot( ages[ages>5], (brate*err*S_t)[ages>5], type="l", xlim=c(0,100), xlab="age" )
-
-  #  sum( brate*err*S_t )
 
   n_mcsamp <- option$n_mcsamp
   mc_para <- option$mc_para
@@ -209,6 +238,13 @@ popLAR <- function( lars0, wgt, agedist, PER, agex ){     #    lars0 <- lars_inc
   colnames(ret) <- c( "male", "male_lo", "male_up", "female", "female_lo", "female_up", "all", "all_lo", "all_up" )
   ret
 }
+
+
+
+
+
+
+
 
 
 

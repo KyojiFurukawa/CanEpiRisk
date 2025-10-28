@@ -173,3 +173,10 @@ plot_agedist <- function( regions=1:5, agedist=agedist_rgn, rgn_labs=names(agedi
     scale_x_continuous(breaks=pop_range_breaks,
                        labels=abs(pop_range_breaks))
 }
+
+
+
+
+
+
+

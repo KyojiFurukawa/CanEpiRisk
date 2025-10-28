@@ -24,12 +24,15 @@ library(CanEpiRisk)
 ```
 
 
-## Vignette
-\vignette("Using WHO global region data")
-\vignette("Using LSS risk models")
-\vignette("Specifying Risk models")
+## Quick Start
 
-## Quick example
+[Using or specifying reference data](fbi.pdf).
+
+[Using or specifying risk models](https://github.com/KyojiFurukawa/CanEpiRisk/doc/CanEpiRisk_Models.R).
+
+[Specifying exposure scenarios](fbi.pdf).
+
+## Quick examples
 
 ```         
 # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
