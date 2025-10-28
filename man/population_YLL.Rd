@@ -36,3 +36,6 @@ Calculate the population-averaged years of life lost due to radiation exposure.
  population_YLL( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # YLL
 
 }
+\seealso{
+\link{YLL}, \link{population_LAR}
+}

@@ -47,6 +47,6 @@ Each site-specific data.frame contains variables "age", "male" and "female".
 
 }
 \seealso{
-[Mortality], [plot_refdata()]
+\link{Mortality}, \link{plot_refdata}
 }
 \keyword{datasets}

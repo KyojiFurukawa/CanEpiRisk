@@ -35,3 +35,6 @@ Calculate the years of life lost due to radiation exposure.
  YLL(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 )   # YLL
 
 }
+\seealso{
+\link{population_YLL}, \link{CER}
+}

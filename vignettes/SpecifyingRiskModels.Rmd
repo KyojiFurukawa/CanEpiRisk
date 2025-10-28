@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-To support the risk calculation process, we developed the CanEpiRisk package---a comprehensive R package designed to facilitate radiation-associated lifetime risk calculation for ionizing radiation exposure. This package incorporates functions for data input, transferring risk models (ERR, EAR), and calculating risk measures (CER and YLL), providing an interface for risk evaluations under various types of exposure scenarios across different populations. The CanEpiRisk package aims to streamline the analytical workflow, enhance reproducibility, and facilitate future extensions, including inverse odds weighting and other transportability methods. A detailed illustration of the package functionalities and example scripts will be included in the following.
+
 
 Any risk model can be used in **CanEpi** by specifying it in the defined form. As an example, the risk models derived from the INWORKS cohort for mortalities from all solid cancer (Richardson et al., 2015) and for leukaemia (Leuraud et al., 2015) can be specified as follows. Note that the uncertainty in the only risk model parameter (ERR/Gy) is specified by the 95% confidence interval, instead of the variance-covariance matrix in the LSS risk models objects.
 

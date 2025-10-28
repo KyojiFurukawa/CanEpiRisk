@@ -43,3 +43,6 @@ Calculate the cumulative excess risk due to radiation exposure.
  CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cases per 10,000
 
 }
+\seealso{
+\link{population_LAR}, \link{YLL}
+}

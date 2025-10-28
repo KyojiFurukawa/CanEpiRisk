@@ -79,6 +79,6 @@ Furukawa, K., D. Preston, S. Funamoto et al. Long-term trend of thyroid cancer r
 Brenner, A.V., H. Sugiyama, D.L. Preston et al. Radiation risk of central nervous system tumors in the Life Span Study of atomic bomb survivors, 1958-2009. Eur J Epidemiol 35(6): 591-600 (2020).
 }
 \seealso{
-[LSS_mortality], [plot_riskmodel()]
+\link{LSS_mortality}, \link{plot_riskmodel}
 }
 \keyword{datasets}

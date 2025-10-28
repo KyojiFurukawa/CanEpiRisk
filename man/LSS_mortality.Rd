@@ -51,6 +51,6 @@ Each site-specific data.frame contains information for the risk model (a vector 
 Ozasa, K., Y. Shimizu, A. Suyama et al. Studies of the mortality of atomic bomb survivors, Report 14, 1950-2003: an overview of cancer and noncancer diseases. Radiat Res 177(3): 229-243 (2012).
 }
 \seealso{
-[LSS_incidence], [plot_riskmodel()]
+\link{LSS_incidence}, \link{plot_riskmodel()}
 }
 \keyword{datasets}

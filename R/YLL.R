@@ -11,7 +11,7 @@
 #'@examples
 #'  # The following examples use default data provided in CanEpiRisk package
 #'  # for riskmodels (LSS_mortality) derived from Life Span Study
-#'  # and baseline mortality rates for WHO global regions (Mortality)
+#'  # and baseline mortality rates for WHO global regions (Mortality).
 #'
 #'  # Example: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
 #'  exp1 <- list( agex=15, doseGy=0.1, sex=2 )   # exposure scenario
@@ -22,6 +22,7 @@
 #'  YLL(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 )   # YLL
 #'
 #'@importFrom MASS mvrnorm
+#'@seealso \link{population_YLL}, \link{CER}
 #'@export
 YLL <- function( exposure, reference, riskmodel, option )
 {
@@ -46,7 +47,7 @@ YLL <- function( exposure, reference, riskmodel, option )
 #'@examples
 #'  # The following examples use default data provided in CanEpiRisk package
 #'  # for riskmodels (LSS_mortality) derived from Life Span Study
-#'  #     baseline rates and age distribution for WHO riskmodels (Mortality, agedist_rgn)
+#'  #     baseline rates and age distribution for WHO riskmodels (Mortality, agedist_rgn).
 #'
 #'  # Example: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
 #'  ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
@@ -55,6 +56,7 @@ YLL <- function( exposure, reference, riskmodel, option )
 #'  mod1 <- LSS_mortality$allsolid$L                     # risk model
 #'  population_YLL( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # YLL
 #'
+#'@seealso \link{YLL}, \link{population_LAR}
 #'@importFrom MASS mvrnorm
 #'@export
 population_YLL <- function( dsGy, reference, riskmodel, agex=1:8*10-5, nmc=10000 ){

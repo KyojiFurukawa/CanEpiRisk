@@ -52,3 +52,6 @@ Calculate the population-averaged lifetime attributable risk due to radiation ex
  population_LAR( dsGy=0.1, reference=ref2, riskmodel=mod2 )    # CER cases per 10,000
 
 }
+\seealso{
+\link{CER}, \link{population_YLL}
+}

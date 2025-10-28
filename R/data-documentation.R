@@ -34,8 +34,7 @@
 #'  # Example 4: plotting lung cancer mortality rates
 #'  plot_refdata( dat=Mortality, outcome="lung", leg_pos=c(0.27,0.95) )
 #'
-#' @seealso [Incidence], [plot_refdata()]
-#' @seealso [dplyr::filter()] for filtering data frames.
+#' @seealso \link{Incidence}, \link{plot_refdata}
 #' @source IARC
 "Mortality"
 
@@ -77,7 +76,7 @@
 #'  plot_riskmodel( rm=LSS_incidence$leukaemia$LQ, title="LSS leukaemia incidence", ymax=c(1.5, .3), add=c(0.01,0) )
 
 #'
-#' @seealso [LSS_incidence], [plot_riskmodel()]
+#' @seealso \link{LSS_incidence}, \link{plot_riskmodel()}
 #' @references Ozasa, K., Y. Shimizu, A. Suyama et al. Studies of the mortality of atomic bomb survivors, Report 14, 1950-2003: an overview of cancer and noncancer diseases. Radiat Res 177(3): 229-243 (2012).
 #' @source IARC
 "LSS_mortality"
@@ -120,7 +119,7 @@
 #'  # Example 4: plotting lung cancer incidence rates
 #'  plot_refdata( dat=Incidence, outcome="lung", leg_pos=c(0.27,0.95) )
 #'
-#' @seealso [Mortality], [plot_refdata()]
+#' @seealso \link{Mortality}, \link{plot_refdata}
 #' @source IARC
 "Incidence"
 
@@ -170,7 +169,8 @@
 #'  plot_riskmodel( rm=LSS_incidence$thyroid$L, title="LSS thyroid cancer incidence", ymax=c(.5, .3) )
 
 #'
-#' @seealso [LSS_mortality], [plot_riskmodel()]
+#' @seealso \link{LSS_mortality}, \link{plot_riskmodel}
+#'
 #' @references Grant, E.J., A. Brenner, H. Sugiyama et al. Solid Cancer Incidence among the Life Span Study of Atomic Bomb Survivors: 1958-2009. Radiat Res 187(5): 513-537 (2017).
 #' @references Hsu, W.L., D.L. Preston, M. Soda et al. The incidence of leukemia, lymphoma and multiple myeloma among atomic bomb survivors: 1950-2001. Radiat Res 179(3): 361-382 (2013).
 #' @references Sakata, R., D.L. Preston, A.V. Brenner et al. Radiation-Related risk of cancers of the upper digestive tract among Japanese atomic bomb survivors. Radiat Res 192(3): 331-344 (2019).

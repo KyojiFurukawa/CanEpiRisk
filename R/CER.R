@@ -11,7 +11,7 @@
 #'@examples
 #'  # The following examples use default data provided in CanEpiRisk package
 #'  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
-#'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence)
+#'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
 #'
 #'  # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
 #'  exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
@@ -29,6 +29,7 @@
 #'  opt2 <- list( maxage=60, err_wgt=0, n_mcsamp=10000)    # option
 #'  CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cases per 10,000
 #'
+#'@seealso \link{population_LAR}, \link{YLL}
 #'@importFrom MASS mvrnorm
 #'@export
 CER <- function( exposure, reference, riskmodel, option )
@@ -64,7 +65,7 @@ CER <- function( exposure, reference, riskmodel, option )
 #'@examples
 #'  # The following examples use default data provided in CanEpiRisk package
 #'  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
-#'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence)
+#'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
 #'
 #'  # Example 1: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
 #'  ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
@@ -80,6 +81,7 @@ CER <- function( exposure, reference, riskmodel, option )
 #'  mod2 <- LSS_incidence$leukaemia$LQ                   # risk model
 #'  population_LAR( dsGy=0.1, reference=ref2, riskmodel=mod2 )    # CER cases per 10,000
 #'
+#'@seealso \link{CER}, \link{population_YLL}
 #'@importFrom MASS mvrnorm
 #'@export
 population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=10000, nmc=10000 ){
