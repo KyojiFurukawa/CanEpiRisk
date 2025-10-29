@@ -1,5 +1,5 @@
 ---
-title: "Using/Specifying Risk Models"
+title: "Calculating cumulative excess risks"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Calculating cumulative excess risks}
@@ -24,109 +24,30 @@ library(CanEpiRisk)
 A risk model used for risk calculations with `CanEpiRisk` package may be a predefined model from either LSS mortality risk model object (*LSS_mortality*) or LSS cancer incidence model object (`LSS_mortality`). Otherwise, the user can specify any risk model by a list object with a certain format. 
 
 
-
 ## (1) Predifined Risk Models
 
 ERR and EAR risk models for cancer mortality and incidence derived from recent Life Span Study of Japanese atomic-bomb studies are available in predefined objects; `Mortality` and `Incidence`. Each risk model for an endpoint (i.e., a site-specific cancer incidence or mortality) is a list object which contains a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`.
 
 ```{r}
-# Mortality
-names(LSS_mortality)   # Sites for which LSS mortality risk models are available
-names(LSS_mortality$allsolid)    # Available dose response models
-LSS_mortality$allsolid$L$err     # Linear ERR model for all solid cancer motality
-LSS_mortality$allsolid$L$ear     # Linear EAR model for all solid cancer motality
+# Cumulative excess risk (CER) calucations 
+# (1) All solid cancer mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
+exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
+ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
+             mortality=Mortality[[1]]$allcause )       # all-cause mortality
+mod1 <- LSS_mortality$allsolid$L                       # risk model
+opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
+CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
 
-LSS_mortality$leukaemia$LQ$err   # Linear-quadratic ERR model for leukaemia motality
-LSS_mortality$lung$L$err         # Linear EAR model for lung cancer motality
-
-# Plotting LSS all solid cancer mortality risk model
-plot_riskmodel( rm=LSS_mortality$allsolid$L, title="LSS all solid cancer mortality, Linear",  leg_pos=c(0.4, 0.95) )
-
-# Incidence
-names(LSS_incidence)   # Sites for which LSS incidence risk models are available
-names(LSS_incidence$allsolid)    # Available dose response models
-LSS_incidence$allsolid$L$err     # Linear ERR model for all solid cancer incidence
-LSS_incidence$allsolid$L$ear     # Linear EAR model for all solid cancer incidence
-# Plotting LSS all solid cancer incidence risk model
-plot_riskmodel( rm=LSS_incidence$allsolid$L, title="LSS all solid cancer incidence, Linear",  leg_pos=c(0.4, 0.95) )
+# (2) Leukaemia incidence, Region-4, male, 6.7(100/15)mGy at ages 30-45, followed up to age 60, LSS LQ EAR
+exp2 <- list( agex=30:44+0.5, doseGy=rep(0.1/15,15), sex=1 )
+ref2 <- list( baseline=Incidence[[4]]$leukaemia,       # baseline rates
+             mortality=Mortality[[4]]$allcause )       # all-cause mortality rates
+mod2 <- LSS_incidence$leukaemia$LQ                     # risk model
+opt2 <- list( maxage=60, err_wgt=0, n_mcsamp=10000)    # option
+CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cases per 10,000
   
 ```
 
-
-## (2) Specifying Risk Models
-
-A risk model may be specified by a list object which has the same structure as in an LSS risk model object (`LSS_mortality` or `LSS_incidence`). As an example, the risk models derived from the INWORKS cohort for mortality from all solid cancer (Richardson et al., 2015) and from leukaemia (Leuraud et al., 2015) can be specified as follows. Note that the uncertainty in the only risk model parameter (ERR/Gy) is specified by the 95% confidence interval, instead of the variance-covariance matrix in the LSS risk models objects.
-
-
-```{r}
-INWORKS_mortality <- NULL
-INWORKS_mortality$allsolid <- NULL
-
-INWORKS_mortality$allsolid$L <- list(
-     err=list(
-       para=c(0.47),                  # ERR/Gy=0.47 (90% CI: 0.18,0.79)  
-       ci= c(0.1392403, 0.8521128),   #  95% CI coverted from 90%CI by Weibull approx.
-       f=function (beta, data, lag=10) {
-           beta[1] * data$dose  * (data$age - data$agex >= lag )
-       }
-       ),
-      ear=list(    # dummry object
-       para=c(4.8/10000),
-       ci= c(0.1068428, 12.5703871)/10000,
-       f=function (beta, data, lag=10) {
-           beta[1] * data$dose  * (data$age - data$agex >= lag )
-       } 
-       )
- 
-  )
-
-INWORKS_mortality$leukaemia$L <- list(
-     err=list(
-       para=c(2.96),                         # ERR/Gy=2.96 (90% CI: 1.17, 5.21) 
-       ci= c(0.8664, 5.6940),
-       f=function (beta, data, lag=2) {
-           beta[1] * data$dose  * (data$age - data$agex >= lag )
-       }
-       ),
-      ear=list(    # dummry object
-       para=c(2.25/10000),
-       ci=c(0.5064054, 4.4914628)/10000,
-       f=function (beta, data, lag=2) {
-           beta[1] * data$dose  * (data$age - data$agex >= lag )
-       } 
-       )
-  )
-
-INWORKS_mortality
-
-
-# Plotting solid cancer mortality risk, male, 
-#          6.7(100/15)mGy at ages 30-45, followed up to age 60, LSS-L, LSS-LQ and INWORKS models
-
-exp4 <- list( agex=30:44+0.5, doseGy=rep(0.1/15,15), sex=1 )   # Exposure scenario
-opt4_err <- list( maxage=90, err_wgt=1 )    # for ERR transfer
-opt4_ear <- list( maxage=90, err_wgt=0 )    # for EAR transfer
-
-lss_err_L  <- Comp_Exrisk( exposure=exp4, riskmodel=LSS_mortality$allsolid$L,     option=opt4_err )
-lss_err_LQ <- Comp_Exrisk( exposure=exp4, riskmodel=LSS_mortality$allsolid$LQ,    option=opt4_err )
-inw_err_L  <- Comp_Exrisk( exposure=exp4, riskmodel=INWORKS_mortality$allsolid$L, option=opt4_err )
-
-lss_ear_L  <- Comp_Exrisk( exposure=exp4, riskmodel=LSS_mortality$allsolid$L,     option=opt4_ear, per=10^4 )
-lss_ear_LQ <- Comp_Exrisk( exposure=exp4, riskmodel=LSS_mortality$allsolid$LQ,    option=opt4_ear, per=10^4 )
-inw_ear_L  <- Comp_Exrisk( exposure=exp4, riskmodel=INWORKS_mortality$allsolid$L, option=opt4_ear, per=10^4 )
-
-plot( c(30,90), c(0,0.1), type="n", ylab="Excess relative rate", xlab="age (years)" )
-lines( lss_err_L, lty=2 )
-lines( lss_err_LQ, lty=3 )
-lines( inw_err_L )
-
-plot( c(30,90), c(0,5), type="n", ylab="Excess absolute rate (cases per 10,000 person years)", xlab="age (years)" )
-lines( lss_ear_L, lty=2 )
-lines( lss_ear_LQ, lty=3 )
-lines( inw_ear_L )
-
-
-```
 
 
 
