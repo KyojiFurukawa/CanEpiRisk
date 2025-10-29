@@ -26,7 +26,7 @@ A risk model used for risk calculations with `CanEpiRisk` package may be a prede
 
 ## (1) Predefined Risk Models
 
-ERR and EAR risk models for cancer mortality and incidence derived from recent Life Span Study of Japanese atomic-bomb studies are available in predefined objects; `Mortality` and `Incidence`. Each risk model for an endpoint (i.e., a site-specific cancer incidence or mortality) is a list object which contains a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`.
+ERR and EAR risk models for cancer mortality and incidence derived from recent Life Span Study of Japanese atomic-bomb studies are available in predefined objects; `LSS_mortality` and `LSS_incidence`. Each risk model for an endpoint (i.e., a site-specific cancer incidence or mortality) is a list object which contains a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`.
 
 ```{r}
 # Mortality

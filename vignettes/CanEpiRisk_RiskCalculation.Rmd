@@ -21,12 +21,16 @@ library(CanEpiRisk)
 
 ## Overview
 
-A risk model used for risk calculations with `CanEpiRisk` package may be a predefined model from either LSS mortality risk model object (*LSS_mortality*) or LSS cancer incidence model object (`LSS_mortality`). Otherwise, the user can specify any risk model by a list object with a certain format. 
+With an exposure scenario, baseline data and a risk model all appropriately provided, cumulative excess risk due (CER) to exposure can be calculated by `CER()` and years of life lost (YLL) by `YLL()`. 
+
+A population-averaged CER and YLL can be calculated by `population_LAR()` and `population_YLL()`, respectively.
 
 
-## (1) Predifined Risk Models
+## Examples
 
-ERR and EAR risk models for cancer mortality and incidence derived from recent Life Span Study of Japanese atomic-bomb studies are available in predefined objects; `Mortality` and `Incidence`. Each risk model for an endpoint (i.e., a site-specific cancer incidence or mortality) is a list object which contains a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`.
+(1) Using Predifined Risk Models
+
+ERR and EAR risk models for cancer mortality and incidence derived from recent Life Span Study of Japanese atomic-bomb studies are available in predefined objects; `LSS_mortality` and `LSS_incidence`. 
 
 ```{r}
 # Cumulative excess risk (CER) calucations 
@@ -48,7 +52,71 @@ CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cas
   
 ```
 
+(2) Using Risk Models defined by user
 
+Each risk model for an endpoint (i.e., a site-specific cancer incidence or mortality) is a list object which contains a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` (or a vector `ci` of confidence interval for a single parameter model) and a function to calculate the risk `f`. Following this structure, user can define any risk model of interest for use in lifetime risk calculation using `CanEpiRisk`.
+
+The following example uses risk models derived from the INWORKS cohort for mortality from all solid cancer (Richardson et al., 2015) and from leukaemia (Leuraud et al., 2015). Note that the uncertainty in the only risk model parameter (ERR/Gy) is specified by the 95% confidence interval, instead of the variance-covariance matrix in the LSS risk models objects. `CER()` uses directly the 95% confidence bounds for computation of confidence intervals when the risk model has only a single parameter. 
+
+```{r}
+INWORKS_mortality <- NULL
+INWORKS_mortality$allsolid <- NULL
+
+INWORKS_mortality$allsolid$L <- list(
+     err=list(
+       para=c(0.47),                  # ERR/Gy=0.47 (90% CI: 0.18,0.79)  
+       ci= c(0.1392403, 0.8521128),   #  95% CI coverted from 90%CI by Weibull approx.
+       f=function (beta, data, lag=10) {
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+       }
+       ),
+      ear=list(    # dummry object
+       para=c(4.8/10000),
+       ci= c(0.1068428, 12.5703871)/10000,
+       f=function (beta, data, lag=10) {
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+       } 
+       )
+ 
+  )
+
+INWORKS_mortality$leukaemia$L <- list(
+     err=list(
+       para=c(2.96),                         # ERR/Gy=2.96 (90% CI: 1.17, 5.21) 
+       ci= c(0.8664, 5.6940),
+       f=function (beta, data, lag=2) {
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+       }
+       ),
+      ear=list(    # dummry object
+       para=c(2.25/10000),
+       ci=c(0.5064054, 4.4914628)/10000,
+       f=function (beta, data, lag=2) {
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+       } 
+       )
+  )
+
+INWORKS_mortality
+
+# Cumulative excess risk (CER) calucations 
+# (1) All solid cancer mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, INWORKS linear ERR
+exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
+ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
+             mortality=Mortality[[1]]$allcause )       # all-cause mortality
+mod1 <- INWORKS_mortality$allsolid$L                       # risk model
+opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
+CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
+
+# (2) Leukaemia incidence, Region-4, male, 6.7(100/15)mGy at ages 30-45, followed up to age 60, INWORKS EAR
+exp2 <- list( agex=30:44+0.5, doseGy=rep(0.1/15,15), sex=1 )
+ref2 <- list( baseline=Incidence[[4]]$leukaemia,       # baseline rates
+             mortality=Mortality[[4]]$allcause )       # all-cause mortality rates
+mod2 <- INWORKS_mortality$leukaemia$L                            # risk model
+opt2 <- list( maxage=60, err_wgt=0, n_mcsamp=10000)    # option
+CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cases per 10,000
+
+```
 
 
 ## References
@@ -58,6 +126,5 @@ Richardson, D.B., E. Cardis, R.D. Daniels et al. Risk of cancer from occupationa
 Richardson, D.B., K. Leuraud, D. Laurier et al. Cancer mortality after low dose exposure to ionising radiation in workers in France, the United Kingdom, and the United States (INWORKS): cohort study. BMJ 382: e074520 (2023).
 
 Leuraud, K., D.B. Richardson, E. Cardis et al. Ionising radiation and risk of death from leukaemia and lymphoma in radiation-monitored workers (INWORKS): an international cohort study. Lancet Haematol 2(7): e276-281 (2015).
-
 
 
