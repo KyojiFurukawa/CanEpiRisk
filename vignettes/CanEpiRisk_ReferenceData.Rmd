@@ -1,5 +1,5 @@
 ---
-title: "Using or Specifying Reference Data"
+title: "Using/Specifying Reference Data"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{CanEpiRisk_ReferenceData}

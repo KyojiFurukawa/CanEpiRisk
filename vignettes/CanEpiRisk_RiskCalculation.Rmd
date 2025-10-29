@@ -2,7 +2,7 @@
 title: "Using/Specifying Risk Models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CanEpiRisk: Using or Specifying Risk Models}
+  %\VignetteIndexEntry{Calculating cumulative excess risks}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,16 +15,17 @@ knitr::opts_chunk$set(
 ```
 
 ## Installation
-
 ```{r setup}
 library(CanEpiRisk)
 ```
 
 ## Overview
 
-A risk model used for risk calculations with `CanEpiRisk` package may be a predefined model from either LSS mortality risk model object (*LSS_mortality*) or LSS cancer incidence model object (`LSS_mortality`). Otherwise, the user can specify any risk model by a list object with a certain format.
+A risk model used for risk calculations with `CanEpiRisk` package may be a predefined model from either LSS mortality risk model object (*LSS_mortality*) or LSS cancer incidence model object (`LSS_mortality`). Otherwise, the user can specify any risk model by a list object with a certain format. 
 
-## (1) Predefined Risk Models
+
+
+## (1) Predifined Risk Models
 
 ERR and EAR risk models for cancer mortality and incidence derived from recent Life Span Study of Japanese atomic-bomb studies are available in predefined objects; `Mortality` and `Incidence`. Each risk model for an endpoint (i.e., a site-specific cancer incidence or mortality) is a list object which contains a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`.
 
@@ -51,9 +52,11 @@ plot_riskmodel( rm=LSS_incidence$allsolid$L, title="LSS all solid cancer inciden
   
 ```
 
+
 ## (2) Specifying Risk Models
 
 A risk model may be specified by a list object which has the same structure as in an LSS risk model object (`LSS_mortality` or `LSS_incidence`). As an example, the risk models derived from the INWORKS cohort for mortality from all solid cancer (Richardson et al., 2015) and from leukaemia (Leuraud et al., 2015) can be specified as follows. Note that the uncertainty in the only risk model parameter (ERR/Gy) is specified by the 95% confidence interval, instead of the variance-covariance matrix in the LSS risk models objects.
+
 
 ```{r}
 INWORKS_mortality <- NULL
@@ -125,6 +128,8 @@ lines( inw_ear_L )
 
 ```
 
+
+
 ## References
 
 Richardson, D.B., E. Cardis, R.D. Daniels et al. Risk of cancer from occupational exposure to ionising radiation: retrospective cohort study of workers in France, the United Kingdom, and the United States (INWORKS). BMJ 351: h5359 (2015).
@@ -132,3 +137,6 @@ Richardson, D.B., E. Cardis, R.D. Daniels et al. Risk of cancer from occupationa
 Richardson, D.B., K. Leuraud, D. Laurier et al. Cancer mortality after low dose exposure to ionising radiation in workers in France, the United Kingdom, and the United States (INWORKS): cohort study. BMJ 382: e074520 (2023).
 
 Leuraud, K., D.B. Richardson, E. Cardis et al. Ionising radiation and risk of death from leukaemia and lymphoma in radiation-monitored workers (INWORKS): an international cohort study. Lancet Haematol 2(7): e276-281 (2015).
+
+
+
