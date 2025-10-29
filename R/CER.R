@@ -54,8 +54,8 @@ CER <- function( exposure, reference, riskmodel, option )
 #'@description Calculate the population-averaged lifetime attributable risk due to radiation exposure.
 #'
 #'@param dsGy radiation dose in Gy or Sv (a single value).
-#'@param reference baseline rate, all cause mortality rate and age distribution in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint, 'mortality' for all cause mortality rates and 'agedist' for age distribution in the reference population).
-#'@param riskmodel risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.
+#'@param reference baseline rate, all cause mortality rate and age distribution in the reference population (a list object, which contains data.frame objects named \code{baseline} for baseline rates of the target endpoint, 'mortality' for all cause mortality rates and 'agedist' for age distribution in the reference population).
+#'@param riskmodel risk model risk model (a list object, which contains two list objects for excess relative risk model (\code{err}) and excess absolute risk model (\code{ear}), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.
 #'@param agex a vector of ages at exposure, which represent age categories (default values: 5, 15, 25, ..., 75 to represent age categories 0-10, 10-20, ..., 70-80) option for risk calculation (a list object, which contains maximum age to follow up (an integer value)
 #'@param PER  an integer (default value: 10000 to show the estimated risk as cases per 10000)
 #'@param mmc  an integer for the Monte Carlo sample size (default: 10000)
@@ -94,8 +94,8 @@ population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=10000
 #'Calculating excess risks
 #'@description Calculate the excess risk from a risk model under a specified exposure scenario.
 #'
-#'@param exposure a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).
-#'@param riskmodel a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).
+#'@param exposure a list object that specifies the exposure scenario, which contains \code{agex} (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).
+#'@param riskmodel a list object that specifies the risk model, which contains two list objects named \code{err} for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).
 #'@param option a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up and a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear).
 #'@param per an integer value for the risk denominator (default=1).
 #'@return information of calculated excess risk (data.frame)

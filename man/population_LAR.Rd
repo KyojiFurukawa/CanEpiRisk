@@ -16,9 +16,9 @@ population_LAR(
 \arguments{
 \item{dsGy}{radiation dose in Gy or Sv (a single value).}
 
-\item{reference}{baseline rate, all cause mortality rate and age distribution in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint, 'mortality' for all cause mortality rates and 'agedist' for age distribution in the reference population).}
+\item{reference}{baseline rate, all cause mortality rate and age distribution in the reference population (a list object, which contains data.frame objects named \code{baseline} for baseline rates of the target endpoint, 'mortality' for all cause mortality rates and 'agedist' for age distribution in the reference population).}
 
-\item{riskmodel}{risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.}
+\item{riskmodel}{risk model risk model (a list object, which contains two list objects for excess relative risk model (\code{err}) and excess absolute risk model (\code{ear}), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.}
 
 \item{agex}{a vector of ages at exposure, which represent age categories (default values: 5, 15, 25, ..., 75 to represent age categories 0-10, 10-20, ..., 70-80) option for risk calculation (a list object, which contains maximum age to follow up (an integer value)}
 
