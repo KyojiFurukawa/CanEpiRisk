@@ -8,3 +8,10 @@
 \description{
 Lifetime Risk Calculation
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://kyojifurukawa.github.io/CanEpiRisk/}
+}
+
+}

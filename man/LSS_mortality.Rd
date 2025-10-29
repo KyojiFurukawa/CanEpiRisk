@@ -7,15 +7,15 @@
 \format{
 A list object of :
 \describe{
-  \item{`allsolid`}{a list object which contains risk model information (see Details)}
-  \item{`esophagus`}{a list object which contains risk model information (see Details)}
-  \item{`stomach`}{a list object which contains risk model information (see Details)}
-  \item{`colon`}{a list object which contains risk model information (see Details)}
-  \item{`liver`}{a list object which contains risk model information (see Details)}
-  \item{`lung`}{a list object which contains risk model information (see Details)}
-  \item{`bladder`}{a list object which contains risk model information (see Details)}
-  \item{`breast`}{a list object which contains risk model information (see Details)}
-  \item{`leukaemia`}{a list object which contains risk model information (see Details)}
+\item{\code{allsolid}}{a list object which contains risk model information (see Details)}
+\item{\code{esophagus}}{a list object which contains risk model information (see Details)}
+\item{\code{stomach}}{a list object which contains risk model information (see Details)}
+\item{\code{colon}}{a list object which contains risk model information (see Details)}
+\item{\code{liver}}{a list object which contains risk model information (see Details)}
+\item{\code{lung}}{a list object which contains risk model information (see Details)}
+\item{\code{bladder}}{a list object which contains risk model information (see Details)}
+\item{\code{breast}}{a list object which contains risk model information (see Details)}
+\item{\code{leukaemia}}{a list object which contains risk model information (see Details)}
 }
 }
 \source{
@@ -28,9 +28,9 @@ LSS_mortality
 LSS mortality risk models for 9 cancer types.
 }
 \details{
-The list object for each risk model contains the 9 site-specific cancer mortality risk models derived from Life Span Study (`allsolid`, `esophagus`, `stomach`, `colon`, `liver`, lung`, `bladder`, `breast`, `leukaemia`).
+The list object for each risk model contains the 9 site-specific cancer mortality risk models derived from Life Span Study (\code{allsolid}, \code{esophagus}, \code{stomach}, \code{colon}, \code{liver}, lung\verb{, }bladder\verb{, }breast\verb{, }leukaemia`).
 
-Each site-specific data.frame contains information for the risk model (a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`).
+Each site-specific data.frame contains information for the risk model (a vector of parameter estimates \code{para}, a matrix of variance-covariance matrix of parameter estimates \code{var} and a function to calculate the risk \code{f}).
 }
 \examples{
  names(LSS_mortality)   # Sites for which LSS mortality risk models are available

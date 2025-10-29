@@ -49,10 +49,10 @@ plot_riskmodel() plots the excess relative and absolute rates of cancer incidenc
 }
 \details{
 The risk model can be specified by the list object provided in CanEpiRisk package; for example
-    LSS_mortality$allsolid$L  for LSS all solid cancer mortality linear model,
-    LSS_incidence$allsolid$LQ for LSS all solid cancer incidence linear-quadratic model,
-    LSS_mortality$leukaemia$LQ for LSS leukaemia mortality linear-quadratic model,
-    LSS_incidence$thyroid$L for LSS thyroid cancer incidence linear model.
+LSS_mortality$allsolid$L  for LSS all solid cancer mortality linear model,
+LSS_incidence$allsolid$LQ for LSS all solid cancer incidence linear-quadratic model,
+LSS_mortality$leukaemia$LQ for LSS leukaemia mortality linear-quadratic model,
+LSS_incidence$thyroid$L for LSS thyroid cancer incidence linear model.
 }
 \examples{
  # The following examples use default data provided in CanEpiRisk package

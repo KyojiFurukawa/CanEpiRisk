@@ -7,19 +7,19 @@
 \format{
 A list object of :
 \describe{
-  \item{`allsolid`}{a list object which contains risk model information (see Details)}
-  \item{`leukaemia`}{a list object which contains risk model information (see Details)}
-  \item{`esophagus`}{a list object which contains risk model information (see Details)}
-  \item{`stomach`}{a list object which contains risk model information (see Details)}
-  \item{`colon`}{a list object which contains risk model information (see Details)}
-  \item{`liver`}{a list object which contains risk model information (see Details)}
-  \item{`lung`}{a list object which contains risk model information (see Details)}
-  \item{`prostate`}{a list object which contains risk model information (see Details)}
-  \item{`pancreas`}{a list object which contains risk model information (see Details)}
-  \item{`bladder`}{a list object which contains risk model information (see Details)}
-  \item{`breast`}{a list object which contains risk model information (see Details)}
-  \item{`thyroid`}{a list object which contains risk model information (see Details)}
-  \item{`brainCNS`}{a list object which contains risk model information (see Details)}
+\item{\code{allsolid}}{a list object which contains risk model information (see Details)}
+\item{\code{leukaemia}}{a list object which contains risk model information (see Details)}
+\item{\code{esophagus}}{a list object which contains risk model information (see Details)}
+\item{\code{stomach}}{a list object which contains risk model information (see Details)}
+\item{\code{colon}}{a list object which contains risk model information (see Details)}
+\item{\code{liver}}{a list object which contains risk model information (see Details)}
+\item{\code{lung}}{a list object which contains risk model information (see Details)}
+\item{\code{prostate}}{a list object which contains risk model information (see Details)}
+\item{\code{pancreas}}{a list object which contains risk model information (see Details)}
+\item{\code{bladder}}{a list object which contains risk model information (see Details)}
+\item{\code{breast}}{a list object which contains risk model information (see Details)}
+\item{\code{thyroid}}{a list object which contains risk model information (see Details)}
+\item{\code{brainCNS}}{a list object which contains risk model information (see Details)}
 }
 }
 \source{
@@ -32,9 +32,9 @@ LSS_incidence
 LSS incidence risk models for 13 cancer sites.
 }
 \details{
-The list object for each risk model contains the 13 site-specific cancer incidence risk models derived from Life Span Study (`leukaemia`, `esophagus`, `stomach`, `colon`, `liver`, `lung`, `prostate`, `pancreas`, `bladder`, `breast`, `thyroid`, `brainCNS`).
+The list object for each risk model contains the 13 site-specific cancer incidence risk models derived from Life Span Study (\code{leukaemia}, \code{esophagus}, \code{stomach}, \code{colon}, \code{liver}, \code{lung}, \code{prostate}, \code{pancreas}, \code{bladder}, \code{breast}, \code{thyroid}, \code{brainCNS}).
 
-Each site-specific list object contains information for the risk model (a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`).
+Each site-specific list object contains information for the risk model (a vector of parameter estimates \code{para}, a matrix of variance-covariance matrix of parameter estimates \code{var} and a function to calculate the risk \code{f}).
 }
 \examples{
  names(LSS_incidence)   # Sites for which LSS incidence risk models are available

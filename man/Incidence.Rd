@@ -7,11 +7,11 @@
 \format{
 A list object of the five WHO global regions:
 \describe{
-  \item{`Aus-NZ Europe Northern America`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-  \item{`Northern Africa - Western Asia`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-  \item{`Latin America and Caribbean`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-  \item{`Asia excl. Western Asia`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-  \item{`Sub-Saharan Africa`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+\item{\verb{Aus-NZ Europe Northern America}}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+\item{\verb{Northern Africa - Western Asia}}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+\item{\verb{Latin America and Caribbean}}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+\item{\verb{Asia excl. Western Asia}}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+\item{\verb{Sub-Saharan Africa}}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
 }
 }
 \source{
@@ -24,9 +24,9 @@ Incidence
 Cancer incidence rates of WHO global regions.
 }
 \details{
-The list object for each region contains the 16 site-specific cancer mortality rates (`esophagus`, `stomach`, `colon`, `liver`, `pancreas`, `lung`, `breast`, `prostate`, `bladder`, `brainCNS`, `thyroid`, `all_leukaemia`, `all_cancer`, `allsolid-NMSC`, `allsolid`, `leukaemia`).
+The list object for each region contains the 16 site-specific cancer mortality rates (\code{esophagus}, \code{stomach}, \code{colon}, \code{liver}, \code{pancreas}, \code{lung}, \code{breast}, \code{prostate}, \code{bladder}, \code{brainCNS}, \code{thyroid}, \code{all_leukaemia}, \code{all_cancer}, \code{allsolid-NMSC}, \code{allsolid}, \code{leukaemia}).
 
-Each site-specific data.frame contains variables `age`, `male` and `female`.
+Each site-specific data.frame contains variables \code{age}, \code{male} and \code{female}.
 }
 \examples{
 

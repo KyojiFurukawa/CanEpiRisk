@@ -43,9 +43,9 @@ plot_refdata Plots the reference data of cancer incidence or mortality rates for
 }
 \details{
 The parameter outcome can be chosen from one of the following character strings for both Mortality and Incidence:
-  "esophagus", "stomach", "colon", "liver", "pancreas", "lung", "breast", "prostate", "bladder"
-  "brainCNS", "thyroid", "all_leukaemia", "all_cancer", "allsolid-NMSC", "allsolid",
-  "leukaemia" (leukaemia excluding CLL).
+"esophagus", "stomach", "colon", "liver", "pancreas", "lung", "breast", "prostate", "bladder"
+"brainCNS", "thyroid", "all_leukaemia", "all_cancer", "allsolid-NMSC", "allsolid",
+"leukaemia" (leukaemia excluding CLL).
 
 For MOrtality, "allcause" and "survival" can be additionally chosen.
 }

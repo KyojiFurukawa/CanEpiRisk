@@ -1,10 +1,10 @@
 #'Calculating cumulative excess risks
 #'@description Calculate the cumulative excess risk due to radiation exposure.
 #'
-#'@param exposure a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).
-#'@param reference a list object that specifies the baseline information of the reference population, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.
-#'@param riskmodel a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates, a matrix 'var' for the variance covariance matrix, and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).
-#'@param option a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up, a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear), an integer value 'n_mcsamp' for the number of Monte Carlo samples, and alpha for the significance level (default=0.05).
+#'@param exposure a list object that specifies the exposure scenario, which contains \code{agex} (a single value or a vector for age(s) at exposure), \code{doseGy} (a single value or a vector of dose(s) in Gy), and \code{sex} (1 or 2 for male or female).
+#'@param reference a list object that specifies the baseline information of the reference population, which contains data.frame objects named \code{baseline} for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.
+#'@param riskmodel a list object that specifies the risk model, which contains two list objects named \code{err} for excess relative rate model and \code{ear} for excess absolute rate model, each of which contains a vector \code{para} for model parameter estimates, a matrix \code{var} for the variance covariance matrix, and a function \code{f} to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).
+#'@param option a list object that specifies optional settings for risk calculation, which contains an integer value \code{maxage} for the maximum age to follow up, a value \code{err_wgt} for the weight for risk transfer (1=err, 0=ear), an integer value \code{n_mcsamp} for the number of Monte Carlo samples, and \code{alpha} for the significance level (default=0.05).
 #'
 #'@return information of calculated risk (vector)
 #'
