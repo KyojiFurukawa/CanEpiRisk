@@ -4,9 +4,9 @@ pkgdown_sha: ~
 articles:
   CanEpiRisk_Models: CanEpiRisk_Models.html
   CanEpiRisk_ReferenceData: CanEpiRisk_ReferenceData.html
+  CanEpiRisk_RiskCalculation: CanEpiRisk_RiskCalculation.html
   CanEpiRisk: CanEpiRisk.html
-  SpecifyingRiskModels: SpecifyingRiskModels.html
-last_built: 2025-10-29T10:46Z
+last_built: 2025-10-29T12:54Z
 urls:
   reference: https://kyojifurukawa.github.io/CanEpiRisk/reference
   article: https://kyojifurukawa.github.io/CanEpiRisk/articles
