@@ -7,11 +7,11 @@
 \format{
 A list object of the five WHO global regions:
 \describe{
-  \item{"Aus-NZ Europe Northern America"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-  \item{"Northern Africa - Western Asia"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-  \item{"Latin America and Caribbean"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-  \item{"Asia excl. Western Asia"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-  \item{"Sub-Saharan Africa"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+  \item{`Aus-NZ Europe Northern America`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+  \item{`Northern Africa - Western Asia`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+  \item{`Latin America and Caribbean`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+  \item{`Asia excl. Western Asia`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+  \item{`Sub-Saharan Africa`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
 }
 }
 \source{
@@ -24,11 +24,11 @@ Mortality
 Cancer mortality rates of WHO global regions.
 }
 \details{
-The list object for each region contains the 18 site-specific cancer mortality rates ("esophagus", "stomach", "colon", "liver", "pancreas", "lung", "breast", "prostate", "bladder", "brainCNS", "thyroid", "all_leukaemia", "all_cancer", "allsolid-NMSC", "allsolid", "leukaemia", "allcause", "survival").
+The list object for each region contains the 18 site-specific cancer mortality rates (`esophagus`, `stomach`, `colon`, `liver`, `pancreas`, `lung`, `breast`, `prostate`, `bladder`, `brainCNS`, `thyroid`, `all_leukaemia`, `all_cancer`, `allsolid-NMSC`, `allsolid`, `leukaemia`, `allcause`, `survival`).
 
-Each site-specific data.frame contains variables "age", "male" and "female".
+Each site-specific data.frame contains variables `age`, `male` and `female`.
 
-For "allcause" mortality data.frame contains age-specific person-year data, "male_py" and "female_py", in addition to "age", "male" and "female".
+For `allcause` mortality data.frame contains age-specific person-year data, `male_py` and `female_py`, in addition to `age`, `male` and `female`.
 }
 \examples{
  names(Mortality)       # WHO global regions

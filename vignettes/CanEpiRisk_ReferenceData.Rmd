@@ -1,0 +1,128 @@
+---
+title: "Using or Specifying Reference Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CanEpiRisk_ReferenceData}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Installation
+```{r setup}
+library(CanEpiRisk)
+```
+
+## Overview
+
+Reference baseline information for cancer mortality or incidence rates may use a predefined list object for WHO global regions for cancer motality rates (`Mortality`) or cancer incidence rates (`Incidence`). Otherwise, the user can specify any reference baseline information by a list object with a defined format. 
+
+
+## (1) Predifined Reference Data
+
+## Mortality
+
+`Mortality` is a list object containing mortality rate reference data for five WHO global regions:
+
+1. Australia–New Zealand & Europe & Northern America
+2. Northern Africa & Western Asia
+3. Latin America & the Caribbean
+4. Asia (excluding Western Asia)
+5. Sub-Saharan Africa
+
+Each regional list contains 18 site-specific cancer mortality datasets, provided as data.frame objects for the following cancer sites:
+`esophagus`, `stomach`, `colon`, `liver`, `pancreas`, `lung`, `breast`, `prostate`, `bladder`, `brainCNS`, `thyroid`, `all_leukaemia`, `all_cancer`, `allsolid-NMSC`, `allsolid`, `leukaemia`, `allcause`, and `survival`.
+
+Each region- and site-specific data.frame contains three rows:
+
+* `age` – age (in years),
+* `male` – age-specific mortality rate for males,
+* `female` – age-specific mortality rate for females.
+
+These age-specific mortality rates are provided in one-year age intervals (from 1 to 100 years) and were linearly interpolated from the corresponding 5-year interval rates.
+
+
+```{r}
+names(Mortality)       # WHO global regions
+names(Mortality[[1]])  # Sites for which baseline mortality rates are available
+
+# All solid cancer mortality rates for Region-1
+head(Mortality[[1]]$allsolid)
+tail(Mortality[[1]]$allsolid)
+
+# Leukaemia mortality rates for Region-3
+head(Mortality[[3]]$leukaemia)
+tail(Mortality[[3]]$leukaemia)
+
+# All-cause mortality rates for Region-5
+head(Mortality[[5]]$allcause)
+tail(Mortality[[5]]$allcause)
+```
+
+Baseline rates may be plotted using `plot_refdata()`.
+
+```{r}
+# Plotting lung cancer mortality rates
+plot_refdata( dat=Mortality, outcome="lung", leg_pos=c(0.27,0.95) )
+```
+
+
+## Incidence
+
+`Incidence` is a list object containing mortality rate reference data for five WHO global regions:
+
+1. Australia–New Zealand & Europe & Northern America
+2. Northern Africa & Western Asia
+3. Latin America & the Caribbean
+4. Asia (excluding Western Asia)
+5. Sub-Saharan Africa
+
+The list object for each region contains data.frames objects for the 16 site-specific cancer incidence risk models derived from Life Span Study (`esophagus`, `stomach`, `colon`, `liver`, `pancreas`, `lung`, `breast`, `prostate`, `bladder`, `brainCNS`, `thyroid`, `all_leukaemia`, `all_cancer`, `allsolid-NMSC`, `allsolid`, `leukaemia`).
+
+Each region- and site-specific data.frame contains three rows:
+
+* `age` – age (in years),
+* `male` – age-specific incidence rate for males,
+* `female` – age-specific incidence rate for females.
+
+These age-specific incidence rates are provided in one-year age intervals (from 1 to 100 years) and were linearly interpolated from the corresponding 5-year interval rates.
+
+```{r}
+names(Incidence)       # WHO global regions
+names(Incidence[[1]])  # Sites for which baseline incidence rates are available
+
+# All solid cancer incidence rates for Region-1
+head(Incidence[[1]]$allsolid)
+tail(Incidence[[1]]$allsolid)
+
+# Leukaemia incidence rates for Region-3
+head(Incidence[[3]]$leukaemia)
+tail(Incidence[[3]]$leukaemia)
+
+# All;-cause incidence rates for Region-5
+head(Incidence[[5]]$allcause)
+tail(Incidence[[5]]$allcause)
+
+# plotting lung cancer incidence rates
+plot_refdata( dat=Incidence, outcome="lung", leg_pos=c(0.27,0.95) )
+
+```
+
+
+## (2) Specifying Reference Data
+
+A risk model may be specified by a list object which has the same structure as in `Mortality` and `Incidence`. 
+
+
+
+
+## References
+
+
+

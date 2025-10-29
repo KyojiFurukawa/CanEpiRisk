@@ -4,7 +4,7 @@
 \alias{Comp_Exrisk}
 \title{Calculating excess risks}
 \usage{
-Comp_Exrisk(exposure, riskmodel, option)
+Comp_Exrisk(exposure, riskmodel, option, per = 1)
 }
 \arguments{
 \item{exposure}{a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).}
@@ -12,6 +12,8 @@ Comp_Exrisk(exposure, riskmodel, option)
 \item{riskmodel}{a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).}
 
 \item{option}{a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up and a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear).}
+
+\item{per}{an integer value for the risk denominator (default=1).}
 }
 \value{
 information of calculated excess risk (data.frame)

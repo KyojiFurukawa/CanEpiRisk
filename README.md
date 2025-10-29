@@ -1,16 +1,16 @@
 # CanEpiRisk
 
-# R Library for Calculation of Lifetime Risk due to Radiation Exposure
+# R Library for Calculation of Lifetime Risks due to Radiation Exposure
 
-Version: 1.0-0 Date: 2025-10-21
+Version: 1.0-0 Date: 2025-10-28
 
-Author & Maintainer: Kyoji Furukawa Required: R (\>= 3.5.0)
+Author & Maintainer: Kyoji Furukawa 
 
 URL: <https://github.com/KyojiFurukawa/CanEpiRisk>
 
 ## Overview
 
-Quantifying cancer risks associated with ionizing radiation exposure is a central concern in radiation epidemiology and public health, particularly when estimating lifetime risks across populations and exposure scenarios. **CanEpiRisk** is a comprehensive R package designed to facilitate radiation-associated lifetime risk calculations. The package provides an integrated framework for importing exposure and demographic data, transferring specified risk models—such as **excess relative risk (ERR)** and **excess absolute risk (EAR)**—and computing key risk measures, including **cumulative excess risk (CER)** and **years of life lost (YLL)**. By offering a unified interface for evaluating risks under various exposure scenarios and across diverse population settings, **CanEpiRisk** streamlines the workflow for radiation risk assessment, enhances analytical reproducibility, and enables transparent comparison of model-based estimates.
+Quantifying cancer risks associated with ionizing radiation exposure is a central concern in radiation epidemiology and public health, particularly when estimating lifetime risks across populations and exposure scenarios. `CanEpiRisk` is a comprehensive R package designed to facilitate radiation-associated lifetime risk calculations. The package provides an integrated framework for importing exposure and demographic data, transferring specified risk models—such as **excess relative risk (ERR)** and **excess absolute risk (EAR)** and computing key risk measures, including **cumulative excess risk (CER)** and **years of life lost (YLL)**. By offering a unified interface for evaluating risks under various exposure scenarios and across diverse population settings, **CanEpiRisk** streamlines the workflow for radiation risk assessment, enhances analytical reproducibility, and enables transparent comparison of model-based estimates.
 
 ---
 
@@ -28,7 +28,7 @@ library(CanEpiRisk)
 
 [Using or specifying reference data](fbi.pdf).
 
-[Using or specifying risk models](https://github.com/KyojiFurukawa/CanEpiRisk/doc/CanEpiRisk_Models.R).
+[Using or specifying risk models](https://github.com/KyojiFurukawa/CanEpiRisk/vignettes/CanEpiRisk_Models.html)
 
 [Specifying exposure scenarios](fbi.pdf).
 

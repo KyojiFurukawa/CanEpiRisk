@@ -6,17 +6,17 @@
 #' @usage Mortality
 #' @format A list object of the five WHO global regions:
 #' \describe{
-#'   \item{"Aus-NZ Europe Northern America"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-#'   \item{"Northern Africa - Western Asia"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-#'   \item{"Latin America and Caribbean"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-#'   \item{"Asia excl. Western Asia"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-#'   \item{"Sub-Saharan Africa"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Aus-NZ Europe Northern America`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Northern Africa - Western Asia`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Latin America and Caribbean`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Asia excl. Western Asia`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Sub-Saharan Africa`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
 #' }
-#' @details The list object for each region contains the 18 site-specific cancer mortality rates ("esophagus", "stomach", "colon", "liver", "pancreas", "lung", "breast", "prostate", "bladder", "brainCNS", "thyroid", "all_leukaemia", "all_cancer", "allsolid-NMSC", "allsolid", "leukaemia", "allcause", "survival").
+#' @details The list object for each region contains the 18 site-specific cancer mortality rates (`esophagus`, `stomach`, `colon`, `liver`, `pancreas`, `lung`, `breast`, `prostate`, `bladder`, `brainCNS`, `thyroid`, `all_leukaemia`, `all_cancer`, `allsolid-NMSC`, `allsolid`, `leukaemia`, `allcause`, `survival`).
 #'
-#' Each site-specific data.frame contains variables "age", "male" and "female".
+#' Each site-specific data.frame contains variables `age`, `male` and `female`.
 #'
-#' For "allcause" mortality data.frame contains age-specific person-year data, "male_py" and "female_py", in addition to "age", "male" and "female".
+#' For `allcause` mortality data.frame contains age-specific person-year data, `male_py` and `female_py`, in addition to `age`, `male` and `female`.
 #'
 #' @examples
 #'  names(Mortality)       # WHO global regions
@@ -47,19 +47,19 @@
 #' @usage LSS_mortality
 #' @format A list object of :
 #' \describe{
-#'   \item{allsolid}{a list object which contains risk model information (see Details)}
-#'   \item{esophagus}{a list object which contains risk model information (see Details)}
-#'   \item{stomach}{a list object which contains risk model information (see Details)}
-#'   \item{colon}{a list object which contains risk model information (see Details)}
-#'   \item{liver}{a list object which contains risk model information (see Details)}
-#'   \item{lung}{a list object which contains risk model information (see Details)}
-#'   \item{bladder}{a list object which contains risk model information (see Details)}
-#'   \item{breast}{a list object which contains risk model information (see Details)}
-#'   \item{leukaemia}{a list object which contains risk model information (see Details)}
+#'   \item{`allsolid`}{a list object which contains risk model information (see Details)}
+#'   \item{`esophagus`}{a list object which contains risk model information (see Details)}
+#'   \item{`stomach`}{a list object which contains risk model information (see Details)}
+#'   \item{`colon`}{a list object which contains risk model information (see Details)}
+#'   \item{`liver`}{a list object which contains risk model information (see Details)}
+#'   \item{`lung`}{a list object which contains risk model information (see Details)}
+#'   \item{`bladder`}{a list object which contains risk model information (see Details)}
+#'   \item{`breast`}{a list object which contains risk model information (see Details)}
+#'   \item{`leukaemia`}{a list object which contains risk model information (see Details)}
 #' }
-#' @details The list object for each risk model contains the 9 site-specific cancer mortality risk models derived from Life Span Study ("allsolid", "esophagus", "stomach", "colon", "liver", lung", "bladder", "breast", "leukaemia").
+#' @details The list object for each risk model contains the 9 site-specific cancer mortality risk models derived from Life Span Study (`allsolid`, `esophagus`, `stomach`, `colon`, `liver`, lung`, `bladder`, `breast`, `leukaemia`).
 #'
-#' Each site-specific data.frame contains information for the risk model (a vector of parameter estimates "para", a matrix of variance-covariance matrix of parameter estimates "var" and a function to calculate the risk "f").
+#' Each site-specific data.frame contains information for the risk model (a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`).
 #'
 #' @examples
 #'  names(LSS_mortality)   # Sites for which LSS mortality risk models are available
@@ -91,15 +91,15 @@
 #' @usage Incidence
 #' @format A list object of the five WHO global regions:
 #' \describe{
-#'   \item{"Aus-NZ Europe Northern America"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-#'   \item{"Northern Africa - Western Asia"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-#'   \item{"Latin America and Caribbean"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-#'   \item{"Asia excl. Western Asia"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
-#'   \item{"Sub-Saharan Africa"}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Aus-NZ Europe Northern America`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Northern Africa - Western Asia`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Latin America and Caribbean`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Asia excl. Western Asia`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
+#'   \item{`Sub-Saharan Africa`}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
 #' }
-#' @details The list object for each region contains the 18 site-specific cancer mortality rates ("esophagus", "stomach", "colon", "liver", "pancreas", "lung", "breast", "prostate", "bladder", "brainCNS", "thyroid", "all_leukaemia", "all_cancer", "allsolid-NMSC", "allsolid", "leukaemia").
+#' @details The list object for each region contains the 16 site-specific cancer mortality rates (`esophagus`, `stomach`, `colon`, `liver`, `pancreas`, `lung`, `breast`, `prostate`, `bladder`, `brainCNS`, `thyroid`, `all_leukaemia`, `all_cancer`, `allsolid-NMSC`, `allsolid`, `leukaemia`).
 #'
-#' Each site-specific data.frame contains variables "age", "male" and "female".
+#' Each site-specific data.frame contains variables `age`, `male` and `female`.
 #'
 #'
 #' @examples
@@ -132,23 +132,23 @@
 #' @usage LSS_incidence
 #' @format A list object of :
 #' \describe{
-#'   \item{allsolid}{a list object which contains risk model information (see Details)}
-#'   \item{leukaemia}{a list object which contains risk model information (see Details)}
-#'   \item{esophagus}{a list object which contains risk model information (see Details)}
-#'   \item{stomach}{a list object which contains risk model information (see Details)}
-#'   \item{colon}{a list object which contains risk model information (see Details)}
-#'   \item{liver}{a list object which contains risk model information (see Details)}
-#'   \item{lung}{a list object which contains risk model information (see Details)}
-#'   \item{prostate}{a list object which contains risk model information (see Details)}
-#'   \item{pancreas}{a list object which contains risk model information (see Details)}
-#'   \item{bladder}{a list object which contains risk model information (see Details)}
-#'   \item{breast}{a list object which contains risk model information (see Details)}
-#'   \item{thyroid}{a list object which contains risk model information (see Details)}
-#'   \item{brainCNS}{a list object which contains risk model information (see Details)}
+#'   \item{`allsolid`}{a list object which contains risk model information (see Details)}
+#'   \item{`leukaemia`}{a list object which contains risk model information (see Details)}
+#'   \item{`esophagus`}{a list object which contains risk model information (see Details)}
+#'   \item{`stomach`}{a list object which contains risk model information (see Details)}
+#'   \item{`colon`}{a list object which contains risk model information (see Details)}
+#'   \item{`liver`}{a list object which contains risk model information (see Details)}
+#'   \item{`lung`}{a list object which contains risk model information (see Details)}
+#'   \item{`prostate`}{a list object which contains risk model information (see Details)}
+#'   \item{`pancreas`}{a list object which contains risk model information (see Details)}
+#'   \item{`bladder`}{a list object which contains risk model information (see Details)}
+#'   \item{`breast`}{a list object which contains risk model information (see Details)}
+#'   \item{`thyroid`}{a list object which contains risk model information (see Details)}
+#'   \item{`brainCNS`}{a list object which contains risk model information (see Details)}
 #' }
-#' @details The list object for each risk model contains the 13 site-specific cancer incidence risk models derived from Life Span Study ("leukaemia", "esophagus", "stomach", "colon", "liver", "lung", "prostate", "pancreas", "bladder", "breast", "thyroid", "brainCNS").
+#' @details The list object for each risk model contains the 13 site-specific cancer incidence risk models derived from Life Span Study (`leukaemia`, `esophagus`, `stomach`, `colon`, `liver`, `lung`, `prostate`, `pancreas`, `bladder`, `breast`, `thyroid`, `brainCNS`).
 #'
-#' Each site-specific list object contains information for the risk model (a vector of parameter estimates "para", a matrix of variance-covariance matrix of parameter estimates "var" and a function to calculate the risk "f").
+#' Each site-specific list object contains information for the risk model (a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`).
 #'
 #' @examples
 #'  names(LSS_incidence)   # Sites for which LSS incidence risk models are available
