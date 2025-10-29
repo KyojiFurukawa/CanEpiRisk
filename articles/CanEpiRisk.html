@@ -36,7 +36,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/CanEpiRisk_Models.html">Using/Specifying Risk Models</a></li>
     <li><a class="dropdown-item" href="../articles/CanEpiRisk_ReferenceData.html">Using/Specifying Reference Data</a></li>
-    <li><a class="dropdown-item" href="../articles/CanEpiRisk_RiskCalculation.html">Using/Specifying Risk Models</a></li>
+    <li><a class="dropdown-item" href="../articles/CanEpiRisk_RiskCalculation.html">Calculating cumulative excess risks</a></li>
   </ul>
 </li>
       </ul>
@@ -68,7 +68,57 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://kyojifurukawa.github.io/CanEpiRisk/">CanEpiRisk</a></span><span class="op">)</span></span></code></pre></div>
-  </main>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>Quantifying cancer risks associated with ionizing radiation exposure
+is a central concern in radiation epidemiology and public health,
+particularly when estimating lifetime risks across populations and
+exposure scenarios. <code>CanEpiRisk</code> is a comprehensive R package
+designed to facilitate radiation-associated lifetime risk calculations.
+The package provides an integrated framework for importing exposure and
+demographic data, transferring specified risk models—such as
+<strong>excess relative risk (ERR)</strong> and <strong>excess absolute
+risk (EAR)</strong> and computing key risk measures, including
+<strong>cumulative excess risk (CER)</strong> and <strong>years of life
+lost (YLL)</strong>. By offering a unified interface for evaluating
+risks under various exposure scenarios and across diverse population
+settings, <strong>CanEpiRisk</strong> streamlines the workflow for
+radiation risk assessment, enhances analytical reproducibility, and
+enables transparent comparison of model-based estimates.</p>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<p><a href="https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_ReferenceData.html" class="external-link">Using/Specifying
+reference data</a>.</p>
+<p><a href="https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_Models.html" class="external-link">Using/Specifying
+risk models</a></p>
+<p><a href="https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_RiskCalculation.html" class="external-link">Calculating
+risks</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="quick-examples">Quick examples<a class="anchor" aria-label="anchor" href="#quick-examples"></a>
+</h2>
+<pre><code><span><span class="co"># Cumulative excess risk (CER) calucations </span></span>
+<span><span class="co"># (1) All solid cancer mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR</span></span>
+<span><span class="va">exp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> agex<span class="op">=</span><span class="fl">5</span>, doseGy<span class="op">=</span><span class="fl">0.1</span>, sex<span class="op">=</span><span class="fl">2</span> <span class="op">)</span>   <span class="co"># exposure scenario</span></span>
+<span><span class="va">ref1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> baseline<span class="op">=</span><span class="va">Mortality</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">allsolid</span>,        <span class="co"># baseline rates</span></span>
+<span>             mortality<span class="op">=</span><span class="va">Mortality</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">allcause</span> <span class="op">)</span>       <span class="co"># all-cause mortality</span></span>
+<span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span>                       <span class="co"># risk model</span></span>
+<span><span class="va">opt1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> maxage<span class="op">=</span><span class="fl">100</span>, err_wgt<span class="op">=</span><span class="fl">1</span>, n_mcsamp<span class="op">=</span><span class="fl">10000</span> <span class="op">)</span>  <span class="co"># option</span></span>
+<span><span class="fu"><a href="../reference/CER.html">CER</a></span><span class="op">(</span>  exposure<span class="op">=</span><span class="va">exp1</span>, reference<span class="op">=</span><span class="va">ref1</span>, riskmodel<span class="op">=</span><span class="va">mod1</span>, option<span class="op">=</span><span class="va">opt1</span> <span class="op">)</span> <span class="op">*</span> <span class="fl">10000</span> <span class="co"># cases per 10,000</span></span>
+<span></span>
+<span><span class="co"># (2) Leukaemia incidence, Region-4, male, 6.7(100/15)mGy at ages 30-45, followed up to age 60, LSS LQ EAR</span></span>
+<span><span class="va">exp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> agex<span class="op">=</span><span class="fl">30</span><span class="op">:</span><span class="fl">44</span><span class="op">+</span><span class="fl">0.5</span>, doseGy<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">/</span><span class="fl">15</span>,<span class="fl">15</span><span class="op">)</span>, sex<span class="op">=</span><span class="fl">1</span> <span class="op">)</span></span>
+<span><span class="va">ref2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> baseline<span class="op">=</span><span class="va">Incidence</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">leukaemia</span>,       <span class="co"># baseline rates</span></span>
+<span>             mortality<span class="op">=</span><span class="va">Mortality</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">allcause</span> <span class="op">)</span>       <span class="co"># all-cause mortality rates</span></span>
+<span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">LSS_incidence</span><span class="op">$</span><span class="va">leukaemia</span><span class="op">$</span><span class="va">LQ</span>                     <span class="co"># risk model</span></span>
+<span><span class="va">opt2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> maxage<span class="op">=</span><span class="fl">60</span>, err_wgt<span class="op">=</span><span class="fl">0</span>, n_mcsamp<span class="op">=</span><span class="fl">10000</span><span class="op">)</span>    <span class="co"># option</span></span>
+<span><span class="fu"><a href="../reference/CER.html">CER</a></span><span class="op">(</span>  exposure<span class="op">=</span><span class="va">exp2</span>, reference<span class="op">=</span><span class="va">ref2</span>, riskmodel<span class="op">=</span><span class="va">mod2</span>, option<span class="op">=</span><span class="va">opt2</span> <span class="op">)</span> <span class="op">*</span> <span class="fl">10000</span> <span class="co"># cases per 10,000</span></span></code></pre>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
