@@ -1,33 +1,95 @@
-#'Calculating cumulative excess risks
-#'@description Calculate the cumulative excess risk due to radiation exposure.
+#' Calculating Cumulative Excess Risks (CER)
 #'
-#'@param exposure a list object that specifies the exposure scenario, which contains \code{agex} (a single value or a vector for age(s) at exposure), \code{doseGy} (a single value or a vector of dose(s) in Gy), and \code{sex} (1 or 2 for male or female).
-#'@param reference a list object that specifies the baseline information of the reference population, which contains data.frame objects named \code{baseline} for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.
-#'@param riskmodel a list object that specifies the risk model, which contains two list objects named \code{err} for excess relative rate model and \code{ear} for excess absolute rate model, each of which contains a vector \code{para} for model parameter estimates, a matrix \code{var} for the variance covariance matrix, and a function \code{f} to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).
-#'@param option a list object that specifies optional settings for risk calculation, which contains an integer value \code{maxage} for the maximum age to follow up, a value \code{err_wgt} for the weight for risk transfer (1=err, 0=ear), an integer value \code{n_mcsamp} for the number of Monte Carlo samples, and \code{alpha} for the significance level (default=0.05).
+#' @title CER: Calculating Cumulative Excess Risks
 #'
-#'@return information of calculated risk (vector)
+#' @description
+#' Compute the **cumulative excess risk (CER)** attributable to radiation exposure for an
+#' individual scenario or cohort, integrating excess risks over age up to a specified
+#' maximum while accounting for competing all-cause mortality and model uncertainty.
+#' This is the core engine for lifetime risk estimation in **CanEpiRisk**.
+#' :contentReference[oaicite:0]{index=0}
 #'
-#'@examples
-#'  # The following examples use default data provided in CanEpiRisk package
-#'  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
-#'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
+#' @details
+#' The function integrates age-specific excess risks implied by the supplied
+#' ERR/EAR model(s) across the attained-age grid (typically ages 1–100). When
+#' `n_mcsamp > 1`, parameter uncertainty is propagated via Monte Carlo sampling
+#' using either the model variance–covariance matrix (`var`) or a 95% CI (`ci`)
+#' for 1-parameter models. For protracted exposures (vectorized `agex`/`doseGy`),
+#' contributions are summed across exposure segments. Baseline site-specific rates
+#' and all-cause mortality must correspond to the same population/region and share
+#' the same age grid and sex coding.
 #'
-#'  # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
-#'  exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
-#'  ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
-#'               mortality=Mortality[[1]]$allcause )       # all-cause mortality
-#'  mod1 <- LSS_mortality$allsolid$L                       # risk model
-#'  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
-#'  CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
+#' @param exposure list. Exposure scenario with components:
+#' \itemize{
+#'   \item \code{agex}: age(s) at exposure (scalar or vector).
+#'   \item \code{doseGy}: dose(s) in gray (Gy); same length as \code{agex} if vectorized.
+#'   \item \code{sex}: sex indicator (\code{1} = male, \code{2} = female).
+#' }
 #'
-#'  # Example 2: leukaemia incidence, Region-4, male, 6.7(100/15)mGy at ages 30-45, followed up to age 60, LSS LQ EAR
-#'  exp2 <- list( agex=30:44+0.5, doseGy=rep(0.1/15,15), sex=1 )
-#'  ref2 <- list( baseline=Incidence[[4]]$leukaemia,       # baseline rates
-#'               mortality=Mortality[[4]]$allcause )       # all-cause mortality rates
-#'  mod2 <- LSS_incidence$leukaemia$LQ                     # risk model
-#'  opt2 <- list( maxage=60, err_wgt=0, n_mcsamp=10000)    # option
-#'  CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cases per 10,000
+#' @param reference list. Baseline reference data for the same population/region with:
+#' \itemize{
+#'   \item \code{baseline}: data frame of site-specific baseline rates (incidence or mortality),
+#'         with columns \code{age}, \code{male}, \code{female} on ages 1:100.
+#'   \item \code{mortality}: data frame of all-cause mortality (same columns/age grid).
+#' }
+#'
+#' @param riskmodel list. Radiation risk model definition with sublists for
+#' \emph{excess relative risk} (ERR) and \emph{excess absolute risk} (EAR), e.g.:
+#' \itemize{
+#'   \item \code{err}/\code{ear}: each a list containing
+#'     \code{para} (numeric parameter vector),
+#'     \code{var} (variance–covariance matrix) \emph{or} \code{ci} (length-2 95\% CI for
+#'     1-parameter models), and
+#'     \code{f} (function of the form \code{f(beta, data, lag)} returning age-specific excess risk).
+#' }
+#'
+#' @param option list. Optional settings:
+#' \itemize{
+#'   \item \code{maxage}: maximum attained age for accumulation (e.g., \code{100}).
+#'   \item \code{err_wgt}: weight to blend ERR vs EAR (\code{1} = pure ERR; \code{0} = pure EAR;
+#'         intermediate values allowed).
+#'   \item \code{n_mcsamp}: Monte Carlo sample size for uncertainty propagation (e.g., \code{10000}).
+#'   \item \code{alpha}: significance level for interval estimation (default \code{0.05}).
+#' }
+#'
+#' @return
+#' A named numeric vector with point and interval summaries of cumulative excess risk,
+#' typically including:
+#' \itemize{
+#'   \item \code{mle}: point estimate,
+#'   \item \code{mean}, \code{median}: Monte Carlo summaries,
+#'   \item \code{ci.2.5\%}, \code{ci.97.5\%}: 95% interval bounds.
+#' }
+#' Values are per person; multiply by \code{1e4} or \code{1e5} to report per 10,000 or 100,000.
+#'
+#' @section Units & Alignment:
+#' Doses must be in Gy. Ensure \code{baseline} and \code{mortality} tables are from the same
+#' population/region and aligned on age (1–100) and sex coding. :contentReference[oaicite:1]{index=1}
+#'
+#' @examples
+#' set.seed(100)
+#' # Example 1: All-solid cancer mortality (Region 1), female, 0.1 Gy at age 15
+#' exp1 <- list(agex = 15, doseGy = 0.1, sex = 2)
+#' ref1 <- list(
+#'   baseline  = Mortality[[1]]$allsolid,
+#'   mortality = Mortality[[1]]$allcause
+#' )
+#' mod1 <- LSS_mortality$allsolid$L
+#' opt1 <- list(maxage = 100, err_wgt = 1, n_mcsamp = 10000)
+#'
+#' CER(exposure = exp1, reference = ref1, riskmodel = mod1, option = opt1) * 10000
+#'
+#' # Example 2: Leukaemia incidence (Region 4), male, 100 mGy evenly across ages 30–45
+#' exp2 <- list(agex = 30:44 + 0.5, doseGy = rep(0.1/15, 15), sex = 1)
+#' ref2 <- list(
+#'   baseline  = Incidence[[4]]$leukaemia,
+#'   mortality = Mortality[[4]]$allcause
+#' )
+#' mod2 <- LSS_incidence$leukaemia$LQ
+#' opt2 <- list(maxage = 60, err_wgt = 0, n_mcsamp = 10000)
+#'
+#' CER(exposure = exp2, reference = ref2, riskmodel = mod2, option = opt2) * 10000
+#'
 #'
 #'@seealso \link{population_LAR}, \link{YLL}
 #'@importFrom MASS mvrnorm

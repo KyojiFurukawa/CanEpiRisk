@@ -2,39 +2,97 @@
 % Please edit documentation in R/YLL.R
 \name{YLL}
 \alias{YLL}
-\title{Calculating years of life lost due to radiation exposure}
+\title{Calculate Years of Life Lost (YLL) due to Radiation Exposure}
 \usage{
 YLL(exposure, reference, riskmodel, option)
 }
 \arguments{
-\item{exposure}{a list object that specifies the exposure scenario, which contains 'agex' (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).}
+\item{exposure}{A \strong{list} specifying the exposure scenario:
+\itemize{
+\item \code{agex} — age(s) at exposure (scalar or numeric vector).
+\item \code{doseGy} — dose(s) in Gray (Gy), scalar or vector of same length as \code{agex}.
+\item \code{sex} — sex indicator (1 = male, 2 = female).
+}}
 
-\item{reference}{a list object that specifies the baseline information of the reference population, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint and 'mortality' for all cause mortality rates.}
+\item{reference}{A \strong{list} specifying baseline and all-cause mortality information:
+\itemize{
+\item \code{baseline} — data.frame of site-specific mortality (or incidence) rates
+per person-year, including columns \code{age}, \code{male}, and \code{female}.
+\item \code{mortality} — data.frame of all-cause mortality rates (per person-year)
+with same structure and age range as \code{baseline}.
+}
+These should correspond to the same population or region.}
 
-\item{riskmodel}{a list object that specifies the risk model, which contains two list objects named 'err' for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates, a matrix 'var' for the variance covariance matrix, and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).}
+\item{riskmodel}{A \strong{list} defining the excess risk model, typically of the form:
+\itemize{
+\item \code{err} and/or \code{ear} — sublists each containing:
+\itemize{
+\item \code{para} — vector of model parameters.
+\item \code{var} — variance–covariance matrix of parameters (for multi-parameter models).
+\item \code{ci} — 95\% confidence bounds for a single-parameter model (alternative to \code{var}).
+\item \code{f(beta, data, lag)} — function returning age-specific excess risks.
+}
+}}
 
-\item{option}{a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up, a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear), an integer value 'n_mcsamp' for the number of Monte Carlo samples, and alpha for the significance level (default=0.05).}
+\item{option}{A \strong{list} of optional settings:
+\itemize{
+\item \code{maxage} — maximum attained age for accumulation (default: 100).
+\item \code{err_wgt} — weight between ERR (1) and EAR (0) transfer models.
+\item \code{n_mcsamp} — number of Monte Carlo draws for uncertainty estimation (default: 10,000).
+\item \code{alpha} — significance level for confidence intervals (default: 0.05).
+}}
 }
 \value{
-information of calculated risk (vector)
+A named numeric vector with point and interval summaries of cumulative excess risk,
+typically including:
+\itemize{
+\item \code{mle}: point estimate,
+\item \code{mean}, \code{median}: Monte Carlo summaries,
+\item \code{ci.2.5\%}, \code{ci.97.5\%}: 95\% interval bounds.
+}
+Values are per person; multiply by \code{1e4} or \code{1e5} to report per 10,000 or 100,000.
 }
 \description{
-Calculate the years of life lost due to radiation exposure.
+Computes the expected \strong{Years of Life Lost (YLL)} attributable to radiation exposure.
+This function integrates site-specific baseline mortality and all-cause mortality rates
+with user-specified excess risk models (ERR/EAR) to estimate the expected reduction
+in life expectancy due to radiation-attributable cancer mortality.
+
+The function supports both single-age and protracted exposure scenarios and allows
+for uncertainty quantification via Monte Carlo sampling.
+}
+\details{
+The YLL estimate integrates the excess mortality over age, weighted by remaining life expectancy,
+producing an interpretable measure of life expectancy loss attributable to radiation.
+The computation uses region- and sex-specific mortality data provided in the package or supplied by the user.
+
+Typical usage involves pairing \code{YLL()} with \code{CER()} or \code{population_YLL()} for
+complementary assessments of probability-based and life loss–based risk metrics.
 }
 \examples{
- # The following examples use default data provided in CanEpiRisk package
- # for riskmodels (LSS_mortality) derived from Life Span Study
- # and baseline mortality rates for WHO global regions (Mortality).
+## Example 1: All-solid cancer mortality (Region 1, female, 0.1 Gy at age 15)
+exp1 <- list(agex = 15, doseGy = 0.1, sex = 2)
+ref1 <- list(
+  baseline  = Mortality[[1]]$allsolid,
+  mortality = Mortality[[1]]$allcause
+)
+mod1 <- LSS_mortality$allsolid$L
+opt1 <- list(maxage = 100, err_wgt = 1, n_mcsamp = 10000)
 
- # Example: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
- exp1 <- list( agex=15, doseGy=0.1, sex=2 )   # exposure scenario
- ref1 <- list( baseline=Mortality[[1]]$allsolid,     # baseline rates
-              mortality=Mortality[[1]]$allcause )    # all-cause mortality
- mod1 <- LSS_mortality$allsolid$L                    # risk model
- opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )
- YLL(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 )   # YLL
+YLL(exposure = exp1, reference = ref1, riskmodel = mod1, option = opt1)
+
+## Example 2: Protracted exposure (EAR, leukaemia incidence)
+exp2 <- list(agex = 30:44 + 0.5, doseGy = rep(0.1 / 15, 15), sex = 1)
+ref2 <- list(
+  baseline  = Incidence[[4]]$leukaemia,
+  mortality = Mortality[[4]]$allcause
+)
+mod2 <- LSS_incidence$leukaemia$LQ
+opt2 <- list(maxage = 60, err_wgt = 0, n_mcsamp = 10000)
+
+YLL(exposure = exp2, reference = ref2, riskmodel = mod2, option = opt2)
 
 }
 \seealso{
-\link{population_YLL}, \link{CER}
+\code{\link{CER}}, \code{\link{population_YLL}}, \code{\link{population_LAR}}
 }
