@@ -45,6 +45,11 @@ The predefined models cover standard **ERR** (excess relative rate) and **EAR** 
 > - Use `lag` to enforce a minimum latency between exposure and attained age (e.g., 5 y for solid cancers, 2 y for leukaemia).
 > - Model objects are organized by **site** and **dose–response form** (e.g., `L` = linear, `LQ` = linear–quadratic), and each has `err` and/or `ear` entries.
 
+
+## 2. Quick start
+
+---
+
 ## (1) Predefined risk models
 
 ### Mortality (LSS)
@@ -117,7 +122,7 @@ my_model <- list(
 > **Tip**: Keep the parameter order in `para` consistent with how you index inside `f()`. 
 
 
-## 2. Example
+## 3. Example
 
 As an example, the following shows how to specify the risk models on derived from the INWORKS cohort for mortality from all solid cancer (Richardson et al., 2015) and from leukaemia (Leuraud et al., 2015). Note that the uncertainty in the only risk model parameter (ERR/Gy) is specified by the 95% confidence interval, instead of the variance-covariance matrix in the LSS risk models objects.
 
