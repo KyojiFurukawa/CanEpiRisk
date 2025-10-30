@@ -35,7 +35,6 @@
 #'  plot_refdata( dat=Mortality, outcome="lung", leg_pos=c(0.27,0.95) )
 #'
 #' @seealso \link{Incidence}, \link{plot_refdata}
-#' @source IARC
 "Mortality"
 
 
@@ -120,7 +119,6 @@
 #'  plot_refdata( dat=Incidence, outcome="lung", leg_pos=c(0.27,0.95) )
 #'
 #' @seealso \link{Mortality}, \link{plot_refdata}
-#' @source IARC
 "Incidence"
 
 
@@ -184,8 +182,6 @@
 #' @references Brenner, A.V., H. Sugiyama, D.L. Preston et al. Radiation risk of central nervous system tumors in the Life Span Study of atomic bomb survivors, 1958-2009. Eur J Epidemiol 35(6): 591-600 (2020).
 #'
 #'
-#'
-#' @source IARC
 "LSS_incidence"
 
 
