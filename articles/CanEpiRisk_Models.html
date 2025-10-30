@@ -127,6 +127,11 @@ has <code>err</code> and/or <code>ear</code> entries.</p>
 </blockquote>
 </div>
 <div class="section level2">
+<h2 id="quick-start">2. Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<hr>
+</div>
+<div class="section level2">
 <h2 id="predefined-risk-models">(1) Predefined risk models<a class="anchor" aria-label="anchor" href="#predefined-risk-models"></a>
 </h2>
 <div class="section level3">
@@ -151,8 +156,8 @@ has <code>err</code> and/or <code>ear</code> entries.</p>
 <span><span class="co">#&gt;               exp(beta[1])*data$dose * exp(beta[2] * (data$agex - 30)/10 + beta[3] * log(data$age/70)) *</span></span>
 <span><span class="co">#&gt;            (1 + c(-1, 1)[data$sex] * beta[4]) * (data$age - data$agex &gt;= lag )</span></span>
 <span><span class="co">#&gt;        }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x555699218030&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x555699218f10&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;bytecode: 0x56233925a2b8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x562339255448&gt;</span></span></code></pre></div>
 <p>Plot an example (all solid, <strong>linear ERR</strong>):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_riskmodel.html">plot_riskmodel</a></span><span class="op">(</span></span>
@@ -242,7 +247,7 @@ consistent with how you index inside <code>f()</code>.</p>
 </blockquote>
 </div>
 <div class="section level2">
-<h2 id="example">2. Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="example">3. Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>As an example, the following shows how to specify the risk models on
 derived from the INWORKS cohort for mortality from all solid cancer
