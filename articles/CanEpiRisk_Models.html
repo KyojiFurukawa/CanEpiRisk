@@ -73,125 +73,111 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://kyojifurukawa.github.io/CanEpiRisk/">CanEpiRisk</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+<h2 id="overview">1. Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>A risk model used for risk calculations with <code>CanEpiRisk</code>
-package may be a predefined model from either LSS mortality risk model
-object (<em>LSS_mortality</em>) or LSS cancer incidence model object
-(<code>LSS_mortality</code>). Otherwise, the user can specify any risk
-model by a list object with a certain format.</p>
+<p><code>CanEpiRisk</code> supports two ways to supply risk models for
+lifetime risk (CER, YLL) and related computations:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Predefined models</strong> from the Life Span Study (LSS) of
+the Japanese atomic-bomb survivors for <strong>mortality</strong> and
+<strong>incidence</strong>:
+<ul>
+<li>
+<code>LSS_mortality</code> (mortality)</li>
+<li>
+<code>LSS_incidence</code> (incidence)</li>
+</ul>
+</li>
+<li>
+<strong>User-specified models</strong>, provided as a list with the
+components:
+<ul>
+<li>
+<code>para</code>: numeric vector of parameter estimates</li>
+<li>
+<code>var</code>: variance–covariance matrix of
+<code>para</code>
+</li>
+<li>
+<code>f(beta, data, lag)</code>: function returning the ERR/EAR
+given parameters <code>beta</code>, a <code>data</code> frame, and a
+minimum latency <code>lag</code>
+</li>
+</ul>
+</li>
+</ol>
+<p>The predefined models cover standard <strong>ERR</strong> (excess
+relative rate) and <strong>EAR</strong> (excess absolute rate)
+formulations for multiple cancer sites. The typical data fields expected
+by the model functions are:</p>
+<ul>
+<li>
+<code>dose</code> (e.g., Gy), <code>age</code> (attained age),
+<code>agex</code> (age at exposure), and <code>sex</code> (1 = male, 2 =
+female).</li>
+</ul>
+<blockquote>
+<p><strong>Notes</strong> - Use <code>lag</code> to enforce a minimum
+latency between exposure and attained age (e.g., 5 y for solid cancers,
+2 y for leukaemia). - Model objects are organized by
+<strong>site</strong> and <strong>dose–response form</strong> (e.g.,
+<code>L</code> = linear, <code>LQ</code> = linear–quadratic), and each
+has <code>err</code> and/or <code>ear</code> entries.</p>
+</blockquote>
 </div>
 <div class="section level2">
-<h2 id="predefined-risk-models">(1) Predefined Risk Models<a class="anchor" aria-label="anchor" href="#predefined-risk-models"></a>
+<h2 id="predefined-risk-models">(1) Predefined risk models<a class="anchor" aria-label="anchor" href="#predefined-risk-models"></a>
 </h2>
-<p>ERR and EAR risk models for cancer mortality and incidence derived
-from recent Life Span Study of Japanese atomic-bomb studies are
-available in predefined objects; <code>LSS_mortality</code> and
-<code>LSS_incidence</code>. Each risk model for an endpoint (i.e., a
-site-specific cancer incidence or mortality) is a list object which
-contains a vector of parameter estimates <code>para</code>, a matrix of
-variance-covariance matrix of parameter estimates <code>var</code> and a
-function to calculate the risk <code>f</code>.</p>
+<div class="section level3">
+<h3 id="mortality-lss">Mortality (LSS)<a class="anchor" aria-label="anchor" href="#mortality-lss"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Mortality</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">LSS_mortality</span><span class="op">)</span>   <span class="co"># Sites for which LSS mortality risk models are available</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">LSS_mortality</span><span class="op">)</span>                 <span class="co"># sites with available mortality models</span></span>
 <span><span class="co">#&gt; [1] "allsolid"  "esophagus" "stomach"   "colon"     "liver"     "lung"     </span></span>
 <span><span class="co">#&gt; [7] "bladder"   "breast"    "leukaemia"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">)</span>    <span class="co"># Available dose response models</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">)</span>        <span class="co"># available dose–response forms for all solid</span></span>
 <span><span class="co">#&gt; [1] "L"  "LQ"</span></span>
-<span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span>     <span class="co"># Linear ERR model for all solid cancer motality</span></span>
-<span><span class="co">#&gt; $para</span></span>
+<span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span><span class="op">$</span><span class="va">para</span>    <span class="co"># parameter vector (example)</span></span>
 <span><span class="co">#&gt; [1] -0.861334 -0.346062 -0.857491  0.344098</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $var</span></span>
+<span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span><span class="op">$</span><span class="va">var</span>     <span class="co"># variance–covariance matrix (example)</span></span>
 <span><span class="co">#&gt;        colon10        ew30      lage70         msex</span></span>
 <span><span class="co">#&gt; 1  0.014180600  0.00333207  0.01639360 -0.000677273</span></span>
 <span><span class="co">#&gt; 2  0.003332070  0.00662021 -0.01588550 -0.001016880</span></span>
 <span><span class="co">#&gt; 3  0.016393600 -0.01588550  0.17911000  0.003545970</span></span>
 <span><span class="co">#&gt; 4 -0.000677273 -0.00101688  0.00354597  0.007714090</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $f</span></span>
+<span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span><span class="op">$</span><span class="va">f</span>       <span class="co"># ERR function</span></span>
 <span><span class="co">#&gt; function (beta, data, lag=5) {</span></span>
 <span><span class="co">#&gt;               exp(beta[1])*data$dose * exp(beta[2] * (data$agex - 30)/10 + beta[3] * log(data$age/70)) *</span></span>
 <span><span class="co">#&gt;            (1 + c(-1, 1)[data$sex] * beta[4]) * (data$age - data$agex &gt;= lag )</span></span>
 <span><span class="co">#&gt;        }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55e012678fe0&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55e012676090&gt;</span></span>
-<span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">ear</span>     <span class="co"># Linear EAR model for all solid cancer motality</span></span>
-<span><span class="co">#&gt; $para</span></span>
-<span><span class="co">#&gt; [1] -5.9371100 -0.2134750  3.3845100  0.0676994</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $var</span></span>
-<span><span class="co">#&gt;        colon10        ew30      lage70        msex</span></span>
-<span><span class="co">#&gt; 32  0.01417250  0.00242883  0.01582030 -0.00474069</span></span>
-<span><span class="co">#&gt; 33  0.00242883  0.00512198 -0.01226210 -0.00002250</span></span>
-<span><span class="co">#&gt; 34  0.01582030 -0.01226210  0.13388100 -0.00584042</span></span>
-<span><span class="co">#&gt; 35 -0.00474069 -0.00002250 -0.00584042  0.00931054</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $f</span></span>
-<span><span class="co">#&gt; function (beta, data, lag=5) {</span></span>
-<span><span class="co">#&gt;          exp(beta[1])*data$dose * exp(beta[2] * (data$agex - 30)/10 + beta[3] * log(data$age/70)) *</span></span>
-<span><span class="co">#&gt;            (1 + c(-1, 1)[data$sex] * beta[4]) * (data$age - data$agex &gt;= lag )</span></span>
-<span><span class="co">#&gt;        }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55e0126793a8&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55e012676090&gt;</span></span>
-<span></span>
-<span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">leukaemia</span><span class="op">$</span><span class="va">LQ</span><span class="op">$</span><span class="va">err</span>   <span class="co"># Linear-quadratic ERR model for leukaemia motality</span></span>
-<span><span class="co">#&gt; $para</span></span>
-<span><span class="co">#&gt;   bm_dose bm_dosesq    lage55 </span></span>
-<span><span class="co">#&gt;  1.379118  1.328138 -1.634167 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $var</span></span>
-<span><span class="co">#&gt;                bm_dose   bm_dosesq       lage55</span></span>
-<span><span class="co">#&gt; bm_dose    0.511572695 -0.16656731 -0.005417054</span></span>
-<span><span class="co">#&gt; bm_dosesq -0.166567310  0.15938148  0.031442880</span></span>
-<span><span class="co">#&gt; lage55    -0.005417054  0.03144288  0.146357021</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $f</span></span>
-<span><span class="co">#&gt; function( beta, data, lag=2 ){</span></span>
-<span><span class="co">#&gt;                    tsx &lt;- data$age-data$agex</span></span>
-<span><span class="co">#&gt;                     ( beta[1]*data$dose + beta[2]*data$dose^2) * </span></span>
-<span><span class="co">#&gt;                         exp( beta[3]*log(data$age/55)  ) * (data$age - data$agex &gt;= lag )</span></span>
-<span><span class="co">#&gt;            }</span></span>
-<span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">lung</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span>         <span class="co"># Linear EAR model for lung cancer motality</span></span>
-<span><span class="co">#&gt; $para</span></span>
-<span><span class="co">#&gt; [1] -0.3123940 -0.0674953  0.1087770  0.4832490</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $var</span></span>
-<span><span class="co">#&gt;         colon10         ew30       lage70         msex</span></span>
-<span><span class="co">#&gt; 21  0.032047300 -0.000480852 -0.006232080  0.002104700</span></span>
-<span><span class="co">#&gt; 22 -0.000480852  0.024757400 -0.100574000 -0.000947684</span></span>
-<span><span class="co">#&gt; 23 -0.006232080 -0.100574000  1.553010000 -0.000694346</span></span>
-<span><span class="co">#&gt; 24  0.002104700 -0.000947684 -0.000694346  0.022580600</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $f</span></span>
-<span><span class="co">#&gt; function (beta, data, lag=5) {</span></span>
-<span><span class="co">#&gt;               exp(beta[1])*data$dose * exp(beta[2] * (data$agex - 30)/10 + beta[3] * log(data$age/70)) *</span></span>
-<span><span class="co">#&gt;            (1 + c(-1, 1)[data$sex] * beta[4]) * (data$age - data$agex &gt;= lag )</span></span>
-<span><span class="co">#&gt;        }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55e0126b3e00&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55e0126b4b90&gt;</span></span>
-<span></span>
-<span><span class="co"># Plotting LSS all solid cancer mortality risk model</span></span>
-<span><span class="fu"><a href="../reference/plot_riskmodel.html">plot_riskmodel</a></span><span class="op">(</span> rm<span class="op">=</span><span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span>, title<span class="op">=</span><span class="st">"LSS all solid cancer mortality, Linear"</span>,  leg_pos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.95</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
-<p><img src="CanEpiRisk_Models_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<span><span class="co">#&gt; &lt;bytecode: 0x558b1519ff50&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x558b151a0e30&gt;</span></span></code></pre></div>
+<p>Plot an example (all solid, <strong>linear ERR</strong>):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># Incidence</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">LSS_incidence</span><span class="op">)</span>   <span class="co"># Sites for which LSS incidence risk models are available</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_riskmodel.html">plot_riskmodel</a></span><span class="op">(</span></span>
+<span>  rm    <span class="op">=</span> <span class="va">LSS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"LSS all solid cancer mortality — Linear"</span>,</span>
+<span>  leg_pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.95</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="CanEpiRisk_Models_files/figure-html/mortality-plot-1.png" width="700"></p>
+</div>
+<div class="section level3">
+<h3 id="incidence-lss">Incidence (LSS)<a class="anchor" aria-label="anchor" href="#incidence-lss"></a>
+</h3>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">LSS_incidence</span><span class="op">)</span>                 <span class="co"># sites with available incidence models</span></span>
 <span><span class="co">#&gt;  [1] "allsolid"  "leukaemia" "esophagus" "stomach"   "colon"     "liver"    </span></span>
 <span><span class="co">#&gt;  [7] "lung"      "prostate"  "pancreas"  "bladder"   "breast"    "thyroid"  </span></span>
 <span><span class="co">#&gt; [13] "brainCNS"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">LSS_incidence</span><span class="op">$</span><span class="va">allsolid</span><span class="op">)</span>    <span class="co"># Available dose response models</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">LSS_incidence</span><span class="op">$</span><span class="va">allsolid</span><span class="op">)</span>        <span class="co"># available dose–response forms for all solid</span></span>
 <span><span class="co">#&gt; [1] "L"  "LQ"</span></span>
-<span><span class="va">LSS_incidence</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span>     <span class="co"># Linear ERR model for all solid cancer incidence</span></span>
-<span><span class="co">#&gt; $para</span></span>
+<span><span class="va">LSS_incidence</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span><span class="op">$</span><span class="va">para</span>    <span class="co"># parameter vector (example)</span></span>
 <span><span class="co">#&gt;      sexMale:dgy    sexFemale:dgy   lage70:sexMale lage70:sexFemale </span></span>
 <span><span class="co">#&gt;        0.2731771        0.6398698       -2.5640146       -1.3783097 </span></span>
 <span><span class="co">#&gt;              e30       hidoseTRUE </span></span>
-<span><span class="co">#&gt;       -0.2330051       -0.2761703 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $var</span></span>
+<span><span class="co">#&gt;       -0.2330051       -0.2761703</span></span>
+<span><span class="va">LSS_incidence</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span><span class="op">$</span><span class="va">var</span>     <span class="co"># variance–covariance matrix (example)</span></span>
 <span><span class="co">#&gt;                    sexMale:dgy sexFemale:dgy lage70:sexMale lage70:sexFemale</span></span>
 <span><span class="co">#&gt; sexMale:dgy       0.0021308300   0.000526540   0.0119066187    -0.0015145731</span></span>
 <span><span class="co">#&gt; sexFemale:dgy     0.0005265400   0.003944061  -0.0019637448     0.0057283111</span></span>
@@ -206,58 +192,65 @@ function to calculate the risk <code>f</code>.</p>
 <span><span class="co">#&gt; lage70:sexFemale -0.0053350872  0.0004417784</span></span>
 <span><span class="co">#&gt; e30               0.0028724210 -0.0003010759</span></span>
 <span><span class="co">#&gt; hidoseTRUE       -0.0003010759  0.0373994998</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $f</span></span>
+<span><span class="va">LSS_incidence</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span><span class="op">$</span><span class="va">f</span>       <span class="co"># ERR function</span></span>
 <span><span class="co">#&gt; function( beta, data, lag=5 ){  exp( beta[5]*(data$agex-30)/10 ) *</span></span>
 <span><span class="co">#&gt;         (  (data$sex==1)*(beta[1]*data$dose) * exp(beta[3]*log(data$age/70)) </span></span>
 <span><span class="co">#&gt;          + (data$sex==2)*(beta[2]*data$dose) * exp(beta[4]*log(data$age/70)) )  * (data$age - data$agex &gt;= lag )</span></span>
-<span><span class="co">#&gt;            }</span></span>
-<span><span class="va">LSS_incidence</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">ear</span>     <span class="co"># Linear EAR model for all solid cancer incidence</span></span>
-<span><span class="co">#&gt; $para</span></span>
-<span><span class="co">#&gt;      sexMale:dgy    sexFemale:dgy   lage70:sexMale lage70:sexFemale </span></span>
-<span><span class="co">#&gt;      0.005444272      0.005452228      2.985824086      2.062337914 </span></span>
-<span><span class="co">#&gt;              e30       hidoseTRUE </span></span>
-<span><span class="co">#&gt;     -0.341867615     -0.288156287 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $var</span></span>
-<span><span class="co">#&gt;                    sexMale:dgy sexFemale:dgy lage70:sexMale lage70:sexFemale</span></span>
-<span><span class="co">#&gt; sexMale:dgy       6.778181e-07  7.736991e-08   1.725090e-04    -2.136372e-05</span></span>
-<span><span class="co">#&gt; sexFemale:dgy     7.736991e-08  2.718133e-07  -2.228262e-05     4.024986e-05</span></span>
-<span><span class="co">#&gt; lage70:sexMale    1.725090e-04 -2.228262e-05   1.479262e-01     8.657096e-03</span></span>
-<span><span class="co">#&gt; lage70:sexFemale -2.136372e-05  4.024986e-05   8.657096e-03     5.508209e-02</span></span>
-<span><span class="co">#&gt; e30               1.329393e-05  1.258732e-05  -5.007734e-03    -4.483048e-03</span></span>
-<span><span class="co">#&gt; hidoseTRUE       -2.347392e-05 -1.818335e-05  -4.514195e-04    -7.435074e-06</span></span>
-<span><span class="co">#&gt;                            e30    hidoseTRUE</span></span>
-<span><span class="co">#&gt; sexMale:dgy       1.329393e-05 -2.347392e-05</span></span>
-<span><span class="co">#&gt; sexFemale:dgy     1.258732e-05 -1.818335e-05</span></span>
-<span><span class="co">#&gt; lage70:sexMale   -5.007734e-03 -4.514195e-04</span></span>
-<span><span class="co">#&gt; lage70:sexFemale -4.483048e-03 -7.435074e-06</span></span>
-<span><span class="co">#&gt; e30               2.655737e-03 -2.652011e-04</span></span>
-<span><span class="co">#&gt; hidoseTRUE       -2.652011e-04  3.709808e-02</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $f</span></span>
-<span><span class="co">#&gt; function( beta, data, lag=5 ){  exp( beta[5]*(data$agex-30)/10 ) *</span></span>
-<span><span class="co">#&gt;         (  (data$sex==1)*(beta[1]*data$dose) * exp(beta[3]*log(data$age/70)) </span></span>
-<span><span class="co">#&gt;          + (data$sex==2)*(beta[2]*data$dose) * exp(beta[4]*log(data$age/70)) )  * (data$age - data$agex &gt;= lag )</span></span>
-<span><span class="co">#&gt;            }</span></span>
-<span><span class="co"># Plotting LSS all solid cancer incidence risk model</span></span>
-<span><span class="fu"><a href="../reference/plot_riskmodel.html">plot_riskmodel</a></span><span class="op">(</span> rm<span class="op">=</span><span class="va">LSS_incidence</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span>, title<span class="op">=</span><span class="st">"LSS all solid cancer incidence, Linear"</span>,  leg_pos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.95</span><span class="op">)</span> <span class="op">)</span></span>
+<span><span class="co">#&gt;            }</span></span></code></pre></div>
+<p>Plot an example (all solid, <strong>linear ERR</strong>):</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_riskmodel.html">plot_riskmodel</a></span><span class="op">(</span></span>
+<span>  rm    <span class="op">=</span> <span class="va">LSS_incidence</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"LSS all solid cancer incidence — Linear"</span>,</span>
+<span>  leg_pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.95</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
-<p><img src="CanEpiRisk_Models_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
+<p><img src="CanEpiRisk_Models_files/figure-html/incidence-plot-1.png" width="700"></p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="specifying-risk-models">(2) Specifying Risk Models<a class="anchor" aria-label="anchor" href="#specifying-risk-models"></a>
+<h2 id="user-specified-risk-models">(2) User-specified risk models<a class="anchor" aria-label="anchor" href="#user-specified-risk-models"></a>
 </h2>
-<p>A risk model may be specified by a list object which has the same
-structure as in an LSS risk model object (<code>LSS_mortality</code> or
-<code>LSS_incidence</code>). As an example, the risk models derived from
-the INWORKS cohort for mortality from all solid cancer (Richardson et
-al., 2015) and from leukaemia (Leuraud et al., 2015) can be specified as
-follows. Note that the uncertainty in the only risk model parameter
-(ERR/Gy) is specified by the 95% confidence interval, instead of the
+<p>You can define a model for any endpoint by supplying a list with the
+required components. Below is a <strong>template</strong> for a linear
+ERR model using the common covariates; adapt as needed.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_err_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">beta</span>, <span class="va">data</span>, <span class="va">lag</span> <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># beta: parameter vector</span></span>
+<span>  <span class="co"># data: data.frame with columns dose, age, agex, sex (1=male, 2=female)</span></span>
+<span>  <span class="co"># lag : minimum latency (years)</span></span>
+<span>  <span class="co"># Example linear in dose with modifiers:</span></span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">beta</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="va">data</span><span class="op">$</span><span class="va">dose</span> <span class="op">*</span></span>
+<span>         <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">beta</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">agex</span> <span class="op">-</span> <span class="fl">30</span><span class="op">)</span> <span class="op">/</span> <span class="fl">10</span> <span class="op">+</span> <span class="va">beta</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">age</span> <span class="op">/</span> <span class="fl">70</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span></span>
+<span>         <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">sex</span><span class="op">]</span> <span class="op">*</span> <span class="va">beta</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span></span>
+<span>         <span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">age</span> <span class="op">-</span> <span class="va">data</span><span class="op">$</span><span class="va">agex</span> <span class="op">&gt;=</span> <span class="va">lag</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  para <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.86</span>, <span class="op">-</span><span class="fl">0.35</span>, <span class="op">-</span><span class="fl">0.86</span>, <span class="fl">0.34</span><span class="op">)</span>,   <span class="co"># example values</span></span>
+<span>  var  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span>, <span class="fl">0.18</span>, <span class="fl">0.008</span><span class="op">)</span><span class="op">)</span>,<span class="co"># example diagonal VCOV</span></span>
+<span>  err  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.86</span>, <span class="op">-</span><span class="fl">0.35</span>, <span class="op">-</span><span class="fl">0.86</span>, <span class="fl">0.34</span><span class="op">)</span>,</span>
+<span>              var  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span>, <span class="fl">0.18</span>, <span class="fl">0.008</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>              f    <span class="op">=</span> <span class="va">my_err_fun</span><span class="op">)</span></span>
+<span>  <span class="co"># optionally: ear = list(para=..., var=..., f=...)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p><strong>Tip</strong>: Keep the parameter order in <code>para</code>
+consistent with how you index inside <code>f()</code>.</p>
+</blockquote>
+</div>
+<div class="section level2">
+<h2 id="example">2. Example<a class="anchor" aria-label="anchor" href="#example"></a>
+</h2>
+<p>As an example, the following shows how to specify the risk models on
+derived from the INWORKS cohort for mortality from all solid cancer
+(Richardson et al., 2015) and from leukaemia (Leuraud et al., 2015).
+Note that the uncertainty in the only risk model parameter (ERR/Gy) is
+specified by the 95% confidence interval, instead of the
 variance-covariance matrix in the LSS risk models objects.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">INWORKS_mortality</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="va">INWORKS_mortality</span><span class="op">$</span><span class="va">allsolid</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span></span>
@@ -295,7 +288,6 @@ variance-covariance matrix in the LSS risk models objects.</p>
 <span>       <span class="op">}</span> </span>
 <span>       <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span></span>
 <span><span class="va">INWORKS_mortality</span></span>
 <span><span class="co">#&gt; $allsolid</span></span>
 <span><span class="co">#&gt; $allsolid$L</span></span>
@@ -358,7 +350,6 @@ variance-covariance matrix in the LSS risk models objects.</p>
 <span><span class="co">#&gt;     beta[1] * data$dose * (data$age - data$agex &gt;= lag)</span></span>
 <span><span class="co">#&gt; }</span></span>
 <span></span>
-<span></span>
 <span><span class="co"># Plotting solid cancer mortality risk, male, </span></span>
 <span><span class="co">#          6.7(100/15)mGy at ages 30-45, followed up to age 60, LSS-L, LSS-LQ and INWORKS models</span></span>
 <span></span>
@@ -378,14 +369,14 @@ variance-covariance matrix in the LSS risk models objects.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span> <span class="va">lss_err_L</span>, lty<span class="op">=</span><span class="fl">2</span> <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span> <span class="va">lss_err_LQ</span>, lty<span class="op">=</span><span class="fl">3</span> <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span> <span class="va">inw_err_L</span> <span class="op">)</span></span></code></pre></div>
-<p><img src="CanEpiRisk_Models_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p><img src="CanEpiRisk_Models_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>,<span class="fl">90</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span><span class="op">)</span>, type<span class="op">=</span><span class="st">"n"</span>, ylab<span class="op">=</span><span class="st">"Excess absolute rate (cases per 10,000 person years)"</span>, xlab<span class="op">=</span><span class="st">"age (years)"</span> <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span> <span class="va">lss_ear_L</span>, lty<span class="op">=</span><span class="fl">2</span> <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span> <span class="va">lss_ear_LQ</span>, lty<span class="op">=</span><span class="fl">3</span> <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span> <span class="va">inw_ear_L</span> <span class="op">)</span></span></code></pre></div>
-<p><img src="CanEpiRisk_Models_files/figure-html/unnamed-chunk-3-2.png" width="700"></p>
+<p><img src="CanEpiRisk_Models_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

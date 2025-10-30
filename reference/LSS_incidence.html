@@ -91,10 +91,6 @@
 
 </dl></div>
     <div class="section level2">
-    <h2 id="source">Source<a class="anchor" aria-label="anchor" href="#source"></a></h2>
-    <p>IARC</p>
-    </div>
-    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The list object for each risk model contains the 13 site-specific cancer incidence risk models derived from Life Span Study (<code>leukaemia</code>, <code>esophagus</code>, <code>stomach</code>, <code>colon</code>, <code>liver</code>, <code>lung</code>, <code>prostate</code>, <code>pancreas</code>, <code>bladder</code>, <code>breast</code>, <code>thyroid</code>, <code>brainCNS</code>).</p>
 <p>Each site-specific list object contains information for the risk model (a vector of parameter estimates <code>para</code>, a matrix of variance-covariance matrix of parameter estimates <code>var</code> and a function to calculate the risk <code>f</code>).</p>
@@ -204,7 +200,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     ( beta[1]*data$dose + beta[2]*data$dose^2) * </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                         exp( beta[3]*log(data$age/70) + beta[4]*log((tsx)/40) ) * (tsx &gt;= lag)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x5646b9fdd790&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x55e7143581c0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span> <span class="va">LSS_incidence</span><span class="op">$</span><span class="va">lung</span><span class="op">$</span><span class="va">L</span><span class="op">$</span><span class="va">err</span>         <span class="co"># Linear ERR model for thyroid cancer incidence</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $para</span>
