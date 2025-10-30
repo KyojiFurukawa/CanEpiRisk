@@ -14,9 +14,6 @@ A list object of the five WHO global regions:
 \item{\verb{Sub-Saharan Africa}}{a list object of 18 items, each of which contains a data.frame of cancer rates (see Details)}
 }
 }
-\source{
-IARC
-}
 \usage{
 Mortality
 }

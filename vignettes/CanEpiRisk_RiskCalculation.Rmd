@@ -165,7 +165,7 @@ MyRiskmodel$allsolid$L <- list(
 
 When a risk model has **one parameter** and includes `ci`, `CER()` uses the CI directly to form uncertainty intervals; otherwise it uses `var` to sample. The following example shows how to specify and using a one-parameter model derived from the INWORKS cohort for mortality from all solid cancer (Richardson et al., 2015) and from leukaemia (Leuraud et al., 2015).
 
-```r
+```{r}
 INWORKS_mortality <- NULL
 INWORKS_mortality$allsolid <- NULL
 
@@ -203,10 +203,8 @@ INWORKS_mortality$leukaemia$L <- list(
        } 
        )
   )
-```
 
-```{r}
-# Cumulative excess risk (CER) calucations 
+# Cumulative excess risk (CER) calculations 
 # (1) All solid cancer mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, INWORKS linear ERR
 exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
 ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates

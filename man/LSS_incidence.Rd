@@ -22,9 +22,6 @@ A list object of :
 \item{\code{brainCNS}}{a list object which contains risk model information (see Details)}
 }
 }
-\source{
-IARC
-}
 \usage{
 LSS_incidence
 }
