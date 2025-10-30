@@ -2,7 +2,7 @@
 title: "Using/Specifying Reference Data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CanEpiRisk_ReferenceData}
+  %\VignetteIndexEntry{Using/Specifying Reference Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,110 +19,150 @@ knitr::opts_chunk$set(
 library(CanEpiRisk)
 ```
 
-## Overview
-
-Reference baseline information for cancer mortality or incidence rates may use a predefined list object for WHO global regions for cancer motality rates (`Mortality`) or cancer incidence rates (`Incidence`). Otherwise, the user can specify any reference baseline information by a list object with a defined format. 
 
 
-## (1) Predifined Reference Data
 
-## Mortality
+## 1. Overview
 
-`Mortality` is a list object containing mortality rate reference data for five WHO global regions:
+This vignette explains how to **use the built‑in reference datasets** (baseline cancer **mortality** and **incidence** rates) and how to **provide your own** reference data in the format expected by `CanEpiRisk`. 
 
-1. Australia–New Zealand & Europe & Northern America
-2. Northern Africa & Western Asia
-3. Latin America & the Caribbean
-4. Asia (excluding Western Asia)
-5. Sub-Saharan Africa
+## 2. Quick start
 
-Each regional list contains 18 site-specific cancer mortality datasets, provided as data.frame objects for the following cancer sites:
-`esophagus`, `stomach`, `colon`, `liver`, `pancreas`, `lung`, `breast`, `prostate`, `bladder`, `brainCNS`, `thyroid`, `all_leukaemia`, `all_cancer`, `allsolid-NMSC`, `allsolid`, `leukaemia`, `allcause`, and `survival`.
+---
 
-Each region- and site-specific data.frame contains three rows:
+## (1) Predefined reference data
 
-* `age` – age (in years),
-* `male` – age-specific mortality rate for males,
-* `female` – age-specific mortality rate for females.
+### Regions
 
-These age-specific mortality rates are provided in one-year age intervals (from 1 to 100 years) and were linearly interpolated from the corresponding 5-year interval rates.
+Both `Mortality` and `Incidence` are **lists of length 5** corresponding to WHO-like global regions:
 
+1. `"Aus-NZ Europe Northern America"`  
+2. `"Northern Africa - Western Asia"`  
+3. `"Latin America and Caribbean"`  
+4. `"Asia excl. Western Asia"`  
+5. `"Sub-Saharan Africa"`  
+
+Show region names:
+
+```{r} 
+names(Mortality)
+names(Incidence)
+```
+
+### Sites and object structure
+
+Each **regional element** is itself a list of **site-specific data.frames**. The names of the sites available for `Mortality` data are:
 
 ```{r}
-names(Mortality)       # WHO global regions
-names(Mortality[[1]])  # Sites for which baseline mortality rates are available
+names(Mortality[[1]])
+```
 
-# All solid cancer mortality rates for Region-1
+The **canonical columns** of each site-specific data.frame are:
+
+- `age` (integer, 1–100)  
+- `male` (numeric)  
+- `female` (numeric)
+
+Rates are provided on a **one‑year age grid** (ages 1–100), which are **linearly interpolated** from corresponding 5‑year rates in the original source (for the highest age category (e.g., 85 or older), the rates are fixed). Some tables (e.g., `allcause`) may also include **person‑years** columns (`male_py` and `female_py`), which may be used for population-based averaging of calculated risks. 
+
+Example (Region 1, all solid cancer mortality):
+
+```{r}
 head(Mortality[[1]]$allsolid)
 tail(Mortality[[1]]$allsolid)
+```
 
-# Leukaemia mortality rates for Region-3
+Example (Region 3, leukaemia mortality):
+
+```{r}
 head(Mortality[[3]]$leukaemia)
 tail(Mortality[[3]]$leukaemia)
+```
 
-# All-cause mortality rates for Region-5
+Example (Region 5, all-cause mortality with person-years):
+
+```{r}
 head(Mortality[[5]]$allcause)
 tail(Mortality[[5]]$allcause)
 ```
 
-Baseline rates may be plotted using `plot_refdata()`.
+### Visualizing baselines
+
+Use `plot_refdata()` to compare site‑specific baselines across regions:
 
 ```{r}
-# Plotting lung cancer mortality rates
-plot_refdata( dat=Mortality, outcome="lung", leg_pos=c(0.27,0.95) )
+# Lung cancer mortality across regions (legend top-left-ish)
+plot_refdata(dat = Mortality, outcome = "lung", leg_pos = c(0.27, 0.95))
+```
+
+---
+
+## Using reference data in risk calculations
+
+A typical calculation needs a **site-specific baseline** and **all‑cause mortality** for the same region:
+
+```{r}
+# Example: CER for all solid cancer mortality (Region 1), female,
+# 0.1 Gy at age 15, follow to age 100, ERR model
+exp  <- list(agex = 15, doseGy = 0.1, sex = 2)
+
+ref  <- list(
+  baseline  = Mortality[[1]]$allsolid,  # site baseline
+  mortality = Mortality[[1]]$allcause   # all-cause mortality
+)
+
+mod  <- LSS_mortality$allsolid$L       # example risk model (linear ERR)
+opt  <- list(maxage = 100, err_wgt = 1, n_mcsamp = 5000)
+
+cer  <- CER(exposure = exp, reference = ref, riskmodel = mod, option = opt)
+cer * 10000
+```
+
+Notes:
+- `sex` is typically coded `1 = male`, `2 = female`.
+- `err_wgt = 1` yields pure **ERR**; `0` would be pure **EAR** (when available).
+
+---
+
+## (2) Providing your own reference data
+
+You may replace the built‑in region lists with your own. CanEpiRisk expects a **list-of-regions**, where each region is a **named list of sites**, and each site is a **data.frame** with at least `age`, `male`, `female` columns on ages `1:100`.
+
+### Minimal template
+
+```r
+# Build a custom region with two sites as an example
+my_region <- list(
+  allsolid = data.frame(
+    age    = 1:100,
+    male   = rep(0, 100),  # replace with your rates
+    female = rep(0, 100)
+  ),
+  allcause = data.frame(
+    age       = 1:100,
+    male      = rep(0, 100),
+    female    = rep(0, 100),
+    male_py   = rep(NA_real_, 100),   # optional
+    female_py = rep(NA_real_, 100)    # optional
+  )
+)
+
 ```
 
 
-## Incidence
+---
 
-`Incidence` is a list object containing mortality rate reference data for five WHO global regions:
+## 3. Notes
 
-1. Australia–New Zealand & Europe & Northern America
-2. Northern Africa & Western Asia
-3. Latin America & the Caribbean
-4. Asia (excluding Western Asia)
-5. Sub-Saharan Africa
+- **Units:** Rates should be **per person-year** on the age grid. If your sources are in 5‑year groups, aggregate or **interpolate** to ages 1–100 to match the package convention.
 
-The list object for each region contains data.frames objects for the 16 site-specific cancer incidence risk models derived from Life Span Study (`esophagus`, `stomach`, `colon`, `liver`, `pancreas`, `lung`, `breast`, `prostate`, `bladder`, `brainCNS`, `thyroid`, `all_leukaemia`, `all_cancer`, `allsolid-NMSC`, `allsolid`, `leukaemia`).
-
-Each region- and site-specific data.frame contains three rows:
-
-* `age` – age (in years),
-* `male` – age-specific incidence rate for males,
-* `female` – age-specific incidence rate for females.
-
-These age-specific incidence rates are provided in one-year age intervals (from 1 to 100 years) and were linearly interpolated from the corresponding 5-year interval rates.
-
-```{r}
-names(Incidence)       # WHO global regions
-names(Incidence[[1]])  # Sites for which baseline incidence rates are available
-
-# All solid cancer incidence rates for Region-1
-head(Incidence[[1]]$allsolid)
-tail(Incidence[[1]]$allsolid)
-
-# Leukaemia incidence rates for Region-3
-head(Incidence[[3]]$leukaemia)
-tail(Incidence[[3]]$leukaemia)
-
-# All;-cause incidence rates for Region-5
-head(Incidence[[5]]$allcause)
-tail(Incidence[[5]]$allcause)
-
-# plotting lung cancer incidence rates
-plot_refdata( dat=Incidence, outcome="lung", leg_pos=c(0.27,0.95) )
-
-```
+---
 
 
-## (2) Specifying Reference Data
+## 4. See also
 
-A risk model may be specified by a list object which has the same structure as in `Mortality` and `Incidence`. 
+- Package overview vignette and risk‑model vignette for how baselines are consumed in `CER()` and related functions.
 
-
-
-
-## References
 
 
 

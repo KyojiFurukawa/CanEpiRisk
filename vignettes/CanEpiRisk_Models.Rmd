@@ -2,7 +2,7 @@
 title: "Using/Specifying Risk Models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CanEpiRisk: Using or Specifying Risk Models}
+  %\VignetteIndexEntry{Using/Specifying Risk Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,40 +20,106 @@ knitr::opts_chunk$set(
 library(CanEpiRisk)
 ```
 
-## Overview
 
-A risk model used for risk calculations with `CanEpiRisk` package may be a predefined model from either LSS mortality risk model object (*LSS_mortality*) or LSS cancer incidence model object (`LSS_mortality`). Otherwise, the user can specify any risk model by a list object with a certain format.
 
-## (1) Predefined Risk Models
 
-ERR and EAR risk models for cancer mortality and incidence derived from recent Life Span Study of Japanese atomic-bomb studies are available in predefined objects; `LSS_mortality` and `LSS_incidence`. Each risk model for an endpoint (i.e., a site-specific cancer incidence or mortality) is a list object which contains a vector of parameter estimates `para`, a matrix of variance-covariance matrix of parameter estimates `var` and a function to calculate the risk `f`.
 
-```{r}
-# Mortality
-names(LSS_mortality)   # Sites for which LSS mortality risk models are available
-names(LSS_mortality$allsolid)    # Available dose response models
-LSS_mortality$allsolid$L$err     # Linear ERR model for all solid cancer motality
-LSS_mortality$allsolid$L$ear     # Linear EAR model for all solid cancer motality
 
-LSS_mortality$leukaemia$LQ$err   # Linear-quadratic ERR model for leukaemia motality
-LSS_mortality$lung$L$err         # Linear EAR model for lung cancer motality
+## 1. Overview
 
-# Plotting LSS all solid cancer mortality risk model
-plot_riskmodel( rm=LSS_mortality$allsolid$L, title="LSS all solid cancer mortality, Linear",  leg_pos=c(0.4, 0.95) )
+`CanEpiRisk` supports two ways to supply risk models for lifetime risk (CER, YLL) and related computations:
 
-# Incidence
-names(LSS_incidence)   # Sites for which LSS incidence risk models are available
-names(LSS_incidence$allsolid)    # Available dose response models
-LSS_incidence$allsolid$L$err     # Linear ERR model for all solid cancer incidence
-LSS_incidence$allsolid$L$ear     # Linear EAR model for all solid cancer incidence
-# Plotting LSS all solid cancer incidence risk model
-plot_riskmodel( rm=LSS_incidence$allsolid$L, title="LSS all solid cancer incidence, Linear",  leg_pos=c(0.4, 0.95) )
-  
+1. **Predefined models** from the Life Span Study (LSS) of the Japanese atomic-bomb survivors for **mortality** and **incidence**:
+   - `LSS_mortality` (mortality)
+   - `LSS_incidence` (incidence)
+2. **User-specified models**, provided as a list with the components:
+   - `para`: numeric vector of parameter estimates
+   - `var`:  variance–covariance matrix of `para`
+   - `f(beta, data, lag)`: function returning the ERR/EAR given parameters `beta`, a `data` frame, and a minimum latency `lag`
+
+The predefined models cover standard **ERR** (excess relative rate) and **EAR** (excess absolute rate) formulations for multiple cancer sites. The typical data fields expected by the model functions are:
+
+- `dose` (e.g., Gy), `age` (attained age), `agex` (age at exposure), and `sex` (1 = male, 2 = female).
+
+> **Notes**
+> - Use `lag` to enforce a minimum latency between exposure and attained age (e.g., 5 y for solid cancers, 2 y for leukaemia).
+> - Model objects are organized by **site** and **dose–response form** (e.g., `L` = linear, `LQ` = linear–quadratic), and each has `err` and/or `ear` entries.
+
+## (1) Predefined risk models
+
+### Mortality (LSS)
+
+```{r mortality-list, eval=TRUE}
+names(LSS_mortality)                 # sites with available mortality models
+names(LSS_mortality$allsolid)        # available dose–response forms for all solid
+LSS_mortality$allsolid$L$err$para    # parameter vector (example)
+LSS_mortality$allsolid$L$err$var     # variance–covariance matrix (example)
+LSS_mortality$allsolid$L$err$f       # ERR function
 ```
 
-## (2) Specifying Risk Models
+Plot an example (all solid, **linear ERR**):
 
-A risk model may be specified by a list object which has the same structure as in an LSS risk model object (`LSS_mortality` or `LSS_incidence`). As an example, the risk models derived from the INWORKS cohort for mortality from all solid cancer (Richardson et al., 2015) and from leukaemia (Leuraud et al., 2015) can be specified as follows. Note that the uncertainty in the only risk model parameter (ERR/Gy) is specified by the 95% confidence interval, instead of the variance-covariance matrix in the LSS risk models objects.
+```{r mortality-plot, eval=TRUE}
+plot_riskmodel(
+  rm    = LSS_mortality$allsolid$L,
+  title = "LSS all solid cancer mortality — Linear",
+  leg_pos = c(0.4, 0.95)
+)
+```
+
+### Incidence (LSS)
+
+```{r incidence-list, eval=TRUE}
+names(LSS_incidence)                 # sites with available incidence models
+names(LSS_incidence$allsolid)        # available dose–response forms for all solid
+LSS_incidence$allsolid$L$err$para    # parameter vector (example)
+LSS_incidence$allsolid$L$err$var     # variance–covariance matrix (example)
+LSS_incidence$allsolid$L$err$f       # ERR function
+```
+
+Plot an example (all solid, **linear ERR**):
+
+```{r incidence-plot, eval=TRUE}
+plot_riskmodel(
+  rm    = LSS_incidence$allsolid$L,
+  title = "LSS all solid cancer incidence — Linear",
+  leg_pos = c(0.4, 0.95)
+)
+```
+
+## (2) User-specified risk models
+
+You can define a model for any endpoint by supplying a list with the required components. Below is a **template** for a linear ERR model using the common covariates; adapt as needed.
+
+```{r custom-template, eval=FALSE}
+my_err_fun <- function(beta, data, lag = 5) {
+  # beta: parameter vector
+  # data: data.frame with columns dose, age, agex, sex (1=male, 2=female)
+  # lag : minimum latency (years)
+  # Example linear in dose with modifiers:
+  out <- exp(beta[1]) * data$dose *
+         exp(beta[2] * (data$agex - 30) / 10 + beta[3] * log(data$age / 70)) *
+         (1 + c(-1, 1)[data$sex] * beta[4]) *
+         (data$age - data$agex >= lag)
+  return(out)
+}
+
+my_model <- list(
+  para = c(-0.86, -0.35, -0.86, 0.34),   # example values
+  var  = diag(c(0.01, 0.01, 0.18, 0.008)),# example diagonal VCOV
+  err  = list(para = c(-0.86, -0.35, -0.86, 0.34),
+              var  = diag(c(0.01, 0.01, 0.18, 0.008)),
+              f    = my_err_fun)
+  # optionally: ear = list(para=..., var=..., f=...)
+)
+```
+
+> **Tip**: Keep the parameter order in `para` consistent with how you index inside `f()`. 
+
+
+## 2. Example
+
+As an example, the following shows how to specify the risk models on derived from the INWORKS cohort for mortality from all solid cancer (Richardson et al., 2015) and from leukaemia (Leuraud et al., 2015). Note that the uncertainty in the only risk model parameter (ERR/Gy) is specified by the 95% confidence interval, instead of the variance-covariance matrix in the LSS risk models objects.
 
 ```{r}
 INWORKS_mortality <- NULL
@@ -93,9 +159,7 @@ INWORKS_mortality$leukaemia$L <- list(
        } 
        )
   )
-
 INWORKS_mortality
-
 
 # Plotting solid cancer mortality risk, male, 
 #          6.7(100/15)mGy at ages 30-45, followed up to age 60, LSS-L, LSS-LQ and INWORKS models
@@ -121,9 +185,9 @@ plot( c(30,90), c(0,5), type="n", ylab="Excess absolute rate (cases per 10,000 p
 lines( lss_ear_L, lty=2 )
 lines( lss_ear_LQ, lty=3 )
 lines( inw_ear_L )
-
-
 ```
+
+
 
 ## References
 
