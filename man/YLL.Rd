@@ -70,6 +70,7 @@ Typical usage involves pairing \code{YLL()} with \code{CER()} or \code{populatio
 complementary assessments of probability-based and life loss–based risk metrics.
 }
 \examples{
+set.seed(100)
 ## Example 1: All-solid cancer mortality (Region 1, female, 0.1 Gy at age 15)
 exp1 <- list(agex = 15, doseGy = 0.1, sex = 2)
 ref1 <- list(
