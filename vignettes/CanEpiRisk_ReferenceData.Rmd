@@ -95,7 +95,6 @@ Use `plot_refdata()` to compare site‑specific baselines across regions:
 plot_refdata(dat = Mortality, outcome = "lung", leg_pos = c(0.27, 0.95))
 ```
 
----
 
 ## Using reference data in risk calculations
 
@@ -149,6 +148,15 @@ my_region <- list(
 
 ```
 
+
+## Age distribution
+
+`CanEpiRisk` has an list object `agedist_rgn` which contains information about the age distribution for each of the WHO global regions. `agedist_rgn` is used to compute the population-averaged risks using functions `population_CER` and `population_YLL`. The age distribution for a WHO global region can be plotted by using function `plot_agedist()` as below.
+
+```{r}
+# Example: age distributions for Regions 1 and 5
+ plot_agedist( regions=c(1,3,5) )
+```
 
 ---
 

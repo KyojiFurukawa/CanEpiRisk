@@ -58,7 +58,7 @@
 #' \itemize{
 #'   \item \code{mle}: point estimate,
 #'   \item \code{mean}, \code{median}: Monte Carlo summaries,
-#'   \item \code{ci.2.5\%}, \code{ci.97.5\%}: 95% interval bounds.
+#'   \item \code{ci_lo}, \code{ci_up}: confidence interval.
 #' }
 #' Values are per person; multiply by \code{1e4} or \code{1e5} to report per 10,000 or 100,000.
 #'
@@ -76,7 +76,7 @@
 #'
 #' YLL(exposure = exp1, reference = ref1, riskmodel = mod1, option = opt1)
 #'
-#' ## Example 2: Protracted exposure (EAR, leukaemia incidence)
+#' ## Example 2: Leukaemia incidence (Region 4), male, 100 mGy evenly across ages 30–45
 #' exp2 <- list(agex = 30:44 + 0.5, doseGy = rep(0.1 / 15, 15), sex = 1)
 #' ref2 <- list(
 #'   baseline  = Incidence[[4]]$leukaemia,
@@ -97,33 +97,96 @@ YLL <- function( exposure, reference, riskmodel, option )
   if( is.null(option$alpha) ) option$alpha <- 0.05  # alpha error (required to compute the confidence interval )
   mle_YLL  <- mc_YLL( exposure, reference, riskmodel, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt) )
   samp <- mc_YLL(  exposure, reference, riskmodel, option )
-  c( mle=mle_YLL, mean=mean(samp), median=median(samp), ci=quantile(samp,c(option$alpha/2,1-option$alpha/2)) )
+  ci <- quantile(samp,c(option$alpha/2,1-option$alpha/2))
+  c( mle=mle_YLL, mean=mean(samp), median=median(samp), ci_lo=ci[1], ci_up=ci[2] )
 }
 
 #'Calculating population-averaged years of life lost
-#'@description Calculate the population-averaged years of life lost due to radiation exposure.
 #'
-#'@param dsGy radiation dose in Gy or Sv (a single value).
-#'@param reference baseline rate, all cause mortality rate and age distribution in the reference population (a list object, which contains data.frame objects named 'baseline' for baseline rates of the target endpoint, 'mortality' for all cause mortality rates and 'agedist' for age distribution in the reference population).
-#'@param riskmodel risk model risk model (a list object, which contains two list objects for excess relative risk model (err) and excess absolute risk model (ear), each of which contains a vector of parameter values (para), a matrix of variance covariance matrix (var), and a function to compute the risk given a parameter vector, a dose value, an age at exposure, an attained age and sex.
-#'@param agex a vector of ages at exposure, which represent age categories (default values: 5, 15, 25, ..., 75 to represent age categories 0-10, 10-20, ..., 70-80) option for risk calculation (a list object, which contains maximum age to follow up (an integer value)
-#'@param mmc  an integer for the Monte Carlo sample size (default: 10000)
+#' @description
+#' Compute **population-averaged years of life lost (YLL)** due to radiation
+#' exposure, aggregating over a population age distribution and sex-specific baseline
+#' rates. The function combines user-specified excess risk models (ERR/EAR) with
+#' site-specific baseline incidence/mortality and all-cause mortality to produce
+#' age-category summaries and overall totals, with uncertainty from Monte Carlo
+#' sampling.
 #'
-#'@return estimated risk information (list)
+#' @details
+#' Let \code{agedist} denote the population age distribution (grouped
+#' ages) and \code{baseline}/\code{mortality} denote site-specific baseline rates and
+#' all-cause mortality for the same region/population and sex coding. For each
+#' age-at-exposure category in \code{agex}, \code{population_LAR()} evaluates LAR under
+#' the supplied risk model(s) and then averages across the age structure, returning
+#' sex-specific estimates and an \code{all}-sex average. Uncertainty is obtained by
+#' drawing model parameters either from a variance–covariance matrix (\code{var}) or,
+#' in one-parameter models, from 95% confidence bounds (\code{ci}) when provided.
 #'
-#'@examples
-#'  set.seed(100)
-#'  # The following examples use default data provided in CanEpiRisk package
-#'  # for riskmodels (LSS_mortality) derived from Life Span Study
-#'  #     baseline rates and age distribution for WHO riskmodels (Mortality, agedist_rgn)
+#' The default
+#' \code{agex = 1:8 * 10 - 5} corresponds to midpoint ages 5, 15, …, 75, i.e.,
+#' exposure categories 0–10, 10–20, …, 70–80 years, which should match the categories of \code{agedist}.
 #'
-#'  # Example: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
-#'  ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
-#'                mortality=Mortality[[1]]$allcause,     # allcause mortality
-#'                  agedist=agedist_rgn[[1]] )           # age distribution
-#'  mod1 <- LSS_mortality$allsolid$L                     # risk model
-#'  population_YLL( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # YLL
+#' @param dsGy Numeric scalar. Radiation **dose** in Gy (or Sv). Must be nonnegative.
 #'
+#' @param reference List describing the target **reference population**, with components:
+#'   \itemize{
+#'     \item \code{baseline} — data frame of site-specific baseline **incidence or mortality**
+#'       rates (per person-year) over ages 1–100, with columns \code{age}, \code{male}, \code{female}.
+#'     \item \code{mortality} — data frame of **all-cause mortality** (same structure/age grid).
+#'     \item \code{agedist} — data frame or vector with the **population age distribution** used
+#'       to average risks across ages (e.g., by single year or grouped ages).
+#'   }
+#'   All three components must refer to the **same region/population** and share consistent
+#'   sex coding.
+#'
+#' @param riskmodel List defining the radiation **risk model**. Typically contains
+#'   sublists for ERR and/or EAR:
+#'   \itemize{
+#'     \item \code{err} / \code{ear} — each is a list with:
+#'       \itemize{
+#'         \item \code{para} — numeric vector of model parameters;
+#'         \item \code{var} — parameter variance–covariance matrix (for multi-parameter models), \emph{or}
+#'               \code{ci} — confidence interval for one-parameter models;
+#'         \item \code{f} — function of the form \code{f(beta, data, lag)} returning age-specific
+#'               excess risk given parameters and data (dose, ages, sex).
+#'       }
+#'   }
+#'   See package examples (e.g., \code{LSS_mortality$allsolid$L}, \code{LSS_incidence$leukaemia$LQ}).
+#'
+#' @param agex Numeric vector of **ages at exposure** (midpoints for grouped categories).
+#'   Default is \code{1:8 * 10 - 5} (i.e., 5, 15, …, 75) representing 0–10, 10–20, …, 70–80.
+#'
+#' @param nmc Integer Monte Carlo sample size for uncertainty propagation. Default \code{10000}.
+#'
+#' @return
+#' A **list** with components for each transfer model present (typically \code{$err} and \code{$ear}).
+#' Each component is a data frame with one row per exposure age category (rows named by
+#' \code{agex}) plus an \code{all} row, and columns:
+#' \itemize{
+#'   \item \code{male}, \code{male_lo}, \code{male_up}
+#'   \item \code{female}, \code{female_lo}, \code{female_up}
+#'   \item \code{all}, \code{all_lo}, \code{all_up}
+#' }
+#' Values are YLL.
+#'
+#' @section Units & Alignment:
+#' Doses must be in Gy (or consistent with your model). Ensure \code{baseline} and
+#' \code{mortality} share the same age grid (typically 1–100) and sex coding, and that
+#' \code{agedist} corresponds to the same population.
+#'
+#' @examples
+#' set.seed(100)
+#' # The following examples use default data provided in CanEpiRisk package
+#' # for riskmodels (LSS_mortality) derived from Life Span Study
+#' #     baseline rates and age distribution for WHO riskmodels (Mortality, agedist_rgn)
+#' # Example: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
+#' ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
+#' mortality=Mortality[[1]]$allcause,     # allcause mortality
+#' agedist=agedist_rgn[[1]] )           # age distribution
+#' mod1 <- LSS_mortality$allsolid$L                     # risk model
+#' population_YLL( dsGy=0.1, reference=ref1, riskmodel=mod1 )
+#'
+#' @seealso
+#' \code{\link{YLL}}, \code{\link{plot_agedist}}, \code{\link{population_CER}}, \code{\link{CER}}
 #'@importFrom MASS mvrnorm
 #'@export
 population_YLL <- function( dsGy, reference, riskmodel, agex=1:8*10-5, nmc=10000 ){

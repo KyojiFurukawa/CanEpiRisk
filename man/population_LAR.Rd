@@ -35,7 +35,7 @@ sublists for ERR and/or EAR:
 \itemize{
 \item \code{para} — numeric vector of model parameters;
 \item \code{var} — parameter variance–covariance matrix (for multi-parameter models), \emph{or}
-\code{ci} — length-2 95\\% bounds for one-parameter models;
+\code{ci} — confidence bounds for one-parameter models;
 \item \code{f} — function of the form \code{f(beta, data, lag)} returning age-specific
 excess risk given parameters and data (dose, ages, sex).
 }
@@ -81,8 +81,7 @@ in one-parameter models, from 95\% confidence bounds (\code{ci}) when provided.
 
 Results are reported \strong{per \code{PER} persons} (default: per 10,000). The default
 \code{agex = 1:8 * 10 - 5} corresponds to midpoint ages 5, 15, …, 75, i.e.,
-exposure categories 0–10, 10–20, …, 70–80 years, matching the examples in the
-package reference.
+exposure categories 0–10, 10–20, …, 70–80 years, which should match the categories of \code{agedist}.
 }
 \section{Units & Alignment}{
 

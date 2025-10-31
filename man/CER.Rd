@@ -26,7 +26,7 @@ with columns \code{age}, \code{male}, \code{female} on ages 1:100.
 \itemize{
 \item \code{err}/\code{ear}: each a list containing
 \code{para} (numeric parameter vector),
-\code{var} (variance–covariance matrix) \emph{or} \code{ci} (length-2 95\\% CI for
+\code{var} (variance–covariance matrix) \emph{or} \code{ci} (confidence interval for
 1-parameter models), and
 \code{f} (function of the form \code{f(beta, data, lag)} returning age-specific excess risk).
 }}
@@ -46,7 +46,7 @@ typically including:
 \itemize{
 \item \code{mle}: point estimate,
 \item \code{mean}, \code{median}: Monte Carlo summaries,
-\item \code{ci.2.5\%}, \code{ci.97.5\%}: 95\% interval bounds.
+\item \code{ci_lo}, \code{ci_up}: confidence intervals.
 }
 Values are per person; multiply by \code{1e4} or \code{1e5} to report per 10,000 or 100,000.
 }

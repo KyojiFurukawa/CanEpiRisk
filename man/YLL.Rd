@@ -48,7 +48,7 @@ typically including:
 \itemize{
 \item \code{mle}: point estimate,
 \item \code{mean}, \code{median}: Monte Carlo summaries,
-\item \code{ci.2.5\%}, \code{ci.97.5\%}: 95\% interval bounds.
+\item \code{ci_lo}, \code{ci_up}: confidence interval.
 }
 Values are per person; multiply by \code{1e4} or \code{1e5} to report per 10,000 or 100,000.
 }
@@ -82,7 +82,7 @@ opt1 <- list(maxage = 100, err_wgt = 1, n_mcsamp = 10000)
 
 YLL(exposure = exp1, reference = ref1, riskmodel = mod1, option = opt1)
 
-## Example 2: Protracted exposure (EAR, leukaemia incidence)
+## Example 2: Leukaemia incidence (Region 4), male, 100 mGy evenly across ages 30–45
 exp2 <- list(agex = 30:44 + 0.5, doseGy = rep(0.1 / 15, 15), sex = 1)
 ref2 <- list(
   baseline  = Incidence[[4]]$leukaemia,

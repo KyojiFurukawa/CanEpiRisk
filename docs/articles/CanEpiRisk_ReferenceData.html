@@ -217,7 +217,6 @@ across regions:</p>
 <code class="sourceCode R"><span><span class="co"># Lung cancer mortality across regions (legend top-left-ish)</span></span>
 <span><span class="fu"><a href="../reference/plot_refdata.html">plot_refdata</a></span><span class="op">(</span>dat <span class="op">=</span> <span class="va">Mortality</span>, outcome <span class="op">=</span> <span class="st">"lung"</span>, leg_pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.27</span>, <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="CanEpiRisk_ReferenceData_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
-<hr>
 </div>
 </div>
 <div class="section level2">
@@ -240,8 +239,8 @@ and <strong>all‑cause mortality</strong> for the same region:</p>
 <span></span>
 <span><span class="va">cer</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CER.html">CER</a></span><span class="op">(</span>exposure <span class="op">=</span> <span class="va">exp</span>, reference <span class="op">=</span> <span class="va">ref</span>, riskmodel <span class="op">=</span> <span class="va">mod</span>, option <span class="op">=</span> <span class="va">opt</span><span class="op">)</span></span>
 <span><span class="va">cer</span> <span class="op">*</span> <span class="fl">10000</span></span>
-<span><span class="co">#&gt;      mle     mean   median  ci.2.5% ci.97.5% </span></span>
-<span><span class="co">#&gt; 156.0667 157.7446 156.0157 115.7108 211.9025</span></span></code></pre></div>
+<span><span class="co">#&gt;         mle        mean      median  ci_lo.2.5% ci_up.97.5% </span></span>
+<span><span class="co">#&gt;    156.0667    157.7446    156.0157    115.7108    211.9025</span></span></code></pre></div>
 <p>Notes: - <code>sex</code> is typically coded <code>1 = male</code>,
 <code>2 = female</code>. - <code>err_wgt = 1</code> yields pure
 <strong>ERR</strong>; <code>0</code> would be pure <strong>EAR</strong>
@@ -276,8 +275,25 @@ expects a <strong>list-of-regions</strong>, where each region is a
 <span>    female_py <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="fl">100</span><span class="op">)</span>    <span class="co"># optional</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<hr>
 </div>
+</div>
+<div class="section level2">
+<h2 id="age-distribution">Age distribution<a class="anchor" aria-label="anchor" href="#age-distribution"></a>
+</h2>
+<p><code>CanEpiRisk</code> has an list object <code>agedist_rgn</code>
+which contains information about the age distribution for each of the
+WHO global regions. <code>agedist_rgn</code> is used to compute the
+population-averaged risks using functions <code>population_CER</code>
+and <code>population_YLL</code>. The age distribution for a WHO global
+region can be plotted by using function <code><a href="../reference/plot_agedist.html">plot_agedist()</a></code> as
+below.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Example: age distributions for Regions 1 and 5</span></span>
+<span> <span class="fu"><a href="../reference/plot_agedist.html">plot_agedist</a></span><span class="op">(</span> regions<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">5</span><span class="op">)</span> <span class="op">)</span></span>
+<span><span class="co">#&gt; Scale for <span style="color: #00BB00;">x</span> is already present.</span></span>
+<span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">x</span>, which will replace the existing scale.</span></span></code></pre></div>
+<p><img src="CanEpiRisk_ReferenceData_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<hr>
 </div>
 <div class="section level2">
 <h2 id="notes">3. Notes<a class="anchor" aria-label="anchor" href="#notes"></a>

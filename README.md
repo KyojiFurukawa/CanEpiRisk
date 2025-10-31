@@ -2,7 +2,7 @@
 
 # R Library for Calculation of Lifetime Risks due to Radiation Exposure
 
-Version: 1.0-0 Date: 2025-10-28
+Version: 1.0-0 Date: 2025-10-31
 
 Author & Maintainer: Kyoji Furukawa 
 

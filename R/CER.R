@@ -37,7 +37,7 @@
 #' \itemize{
 #'   \item \code{err}/\code{ear}: each a list containing
 #'     \code{para} (numeric parameter vector),
-#'     \code{var} (variance–covariance matrix) \emph{or} \code{ci} (length-2 95\% CI for
+#'     \code{var} (variance–covariance matrix) \emph{or} \code{ci} (confidence interval for
 #'     1-parameter models), and
 #'     \code{f} (function of the form \code{f(beta, data, lag)} returning age-specific excess risk).
 #' }
@@ -57,7 +57,7 @@
 #' \itemize{
 #'   \item \code{mle}: point estimate,
 #'   \item \code{mean}, \code{median}: Monte Carlo summaries,
-#'   \item \code{ci.2.5\%}, \code{ci.97.5\%}: 95% interval bounds.
+#'   \item \code{ci_lo}, \code{ci_up}: confidence intervals.
 #' }
 #' Values are per person; multiply by \code{1e4} or \code{1e5} to report per 10,000 or 100,000.
 #'
@@ -96,18 +96,19 @@
 #'@export
 CER <- function( exposure, reference, riskmodel, option )
 {
-  if( is.null(option$alpha) ) option$alpha <- 0.05  # alpha error (required to compute the confidence interval )
+  if( is.null(option$alpha) ) option$alpha <- 0.05  # alpha error (required for specifying the level of confidence interval)
   mle_CER  <- mc_CER(  exposure, reference, riskmodel, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
-  if( is.null( riskmodel$err$var )  ){   # in case of a riskmodel with a single err/ear parameter
+  if( is.null( riskmodel$err$var )  ){  # If riskmodel has only a single err/ear parameter with a confidence interval...
     rm <- riskmodel
     rm$err$para <- rm$err$ci[1]; rm$ear$para <- rm$ear$ci[1]
     loci_CER  <- mc_CER(  exposure, reference, rm, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
     rm$err$para <- rm$err$ci[2]; rm$ear$para <- rm$ear$ci[2]
     upci_CER  <- mc_CER(  exposure, reference, rm, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
-    res <- c( mle=mle_CER, mean=mle_CER, median=mle_CER, ci=c(loci_CER, upci_CER) )
+    res <- c( mle=mle_CER, mean=mle_CER, median=mle_CER, ci_lo=loci_CER, ci_up=upci_CER )
   } else {
     samp_CER <- mc_CER(  exposure, reference, riskmodel, option )
-    res <- c( mle=mle_CER, mean=mean(samp_CER), median=median(samp_CER), ci=quantile(samp_CER,c(option$alpha/2,1-option$alpha/2)) )
+    ci <- c( quantile(samp_CER,c(option$alpha/2,1-option$alpha/2) ) )
+    res <- c( mle=mle_CER, mean=mean(samp_CER), median=median(samp_CER), ci_lo=ci[1], ci_up=ci[2] )
   }
   res
 }
@@ -134,8 +135,7 @@ CER <- function( exposure, reference, riskmodel, option )
 #'
 #' Results are reported **per \code{PER} persons** (default: per 10,000). The default
 #' \code{agex = 1:8 * 10 - 5} corresponds to midpoint ages 5, 15, …, 75, i.e.,
-#' exposure categories 0–10, 10–20, …, 70–80 years, matching the examples in the
-#' package reference.
+#' exposure categories 0–10, 10–20, …, 70–80 years, which should match the categories of \code{agedist}.
 #'
 #' @param dsGy Numeric scalar. Radiation **dose** in Gy (or Sv if your model is parameterized
 #'   accordingly). Must be nonnegative.
@@ -158,7 +158,7 @@ CER <- function( exposure, reference, riskmodel, option )
 #'       \itemize{
 #'         \item \code{para} — numeric vector of model parameters;
 #'         \item \code{var} — parameter variance–covariance matrix (for multi-parameter models), \emph{or}
-#'               \code{ci} — length-2 95\% bounds for one-parameter models;
+#'               \code{ci} — confidence bounds for one-parameter models;
 #'         \item \code{f} — function of the form \code{f(beta, data, lag)} returning age-specific
 #'               excess risk given parameters and data (dose, ages, sex).
 #'       }
@@ -261,13 +261,7 @@ Comp_Exrisk <- function( exposure, riskmodel, option, per=1 ){
   data.frame( age=ages, risk=b*per )
 }
 
-
-
-
-
-mc_CER <- function( exposure, reference, riskmodel, option )
-{
-  #   exposure=exposure0; reference=reference0; riskmodel=riskmodel0; option=option0
+mc_CER <- function( exposure, reference, riskmodel, option ){
   ages <- reference$baseline$age
   nexp <- length(exposure$agex)
   sexlab <- c("male", "female")[exposure$sex]
@@ -326,8 +320,6 @@ mc_CER <- function( exposure, reference, riskmodel, option )
 
 
 mc_popLAR <- function( ds, riskmodel, reference, agexs, n_mcsamp=0 ){
-  # ds=0.1; riskmodel=rm0; reference=ref0; n_mcsamp=B; agexs=AGEX
-
   if( n_mcsamp > 0 ){
     mc_paras_err <- MASS::mvrnorm( n=n_mcsamp, mu=riskmodel$err$para, Sigma=riskmodel$err$var )
     mc_paras_ear <- MASS::mvrnorm( n=n_mcsamp, mu=riskmodel$ear$para, Sigma=riskmodel$ear$var )

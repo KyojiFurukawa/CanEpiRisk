@@ -103,7 +103,7 @@ with same structure and age range as <code>baseline</code>.</p></li>
     <p>A named numeric vector with point and interval summaries of cumulative excess risk,
 typically including:</p><ul><li><p><code>mle</code>: point estimate,</p></li>
 <li><p><code>mean</code>, <code>median</code>: Monte Carlo summaries,</p></li>
-<li><p><code>ci.2.5%</code>, <code>ci.97.5%</code>: 95% interval bounds.</p></li>
+<li><p><code>ci_lo</code>, <code>ci_up</code>: confidence interval.</p></li>
 </ul><p>Values are per person; multiply by <code>1e4</code> or <code>1e5</code> to report per 10,000 or 100,000.</p>
     </div>
     <div class="section level2">
@@ -132,10 +132,10 @@ complementary assessments of probability-based and life loss–based risk metric
 <span class="r-in"><span><span class="va">opt1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxage <span class="op">=</span> <span class="fl">100</span>, err_wgt <span class="op">=</span> <span class="fl">1</span>, n_mcsamp <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">YLL</span><span class="op">(</span>exposure <span class="op">=</span> <span class="va">exp1</span>, reference <span class="op">=</span> <span class="va">ref1</span>, riskmodel <span class="op">=</span> <span class="va">mod1</span>, option <span class="op">=</span> <span class="va">opt1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       mle      mean    median   ci.2.5%  ci.97.5% </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.2408580 0.2437128 0.2417327 0.1884222 0.3090655 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         mle        mean      median  ci_lo.2.5% ci_up.97.5% </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.2408580   0.2437128   0.2417327   0.1884222   0.3090655 </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Example 2: Protracted exposure (EAR, leukaemia incidence)</span></span></span>
+<span class="r-in"><span><span class="co">## Example 2: Leukaemia incidence (Region 4), male, 100 mGy evenly across ages 30–45</span></span></span>
 <span class="r-in"><span><span class="va">exp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>agex <span class="op">=</span> <span class="fl">30</span><span class="op">:</span><span class="fl">44</span> <span class="op">+</span> <span class="fl">0.5</span>, doseGy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span> <span class="op">/</span> <span class="fl">15</span>, <span class="fl">15</span><span class="op">)</span>, sex <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ref2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  baseline  <span class="op">=</span> <span class="va">Incidence</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">leukaemia</span>,</span></span>
@@ -145,7 +145,7 @@ complementary assessments of probability-based and life loss–based risk metric
 <span class="r-in"><span><span class="va">opt2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxage <span class="op">=</span> <span class="fl">60</span>, err_wgt <span class="op">=</span> <span class="fl">0</span>, n_mcsamp <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">YLL</span><span class="op">(</span>exposure <span class="op">=</span> <span class="va">exp2</span>, reference <span class="op">=</span> <span class="va">ref2</span>, riskmodel <span class="op">=</span> <span class="va">mod2</span>, option <span class="op">=</span> <span class="va">opt2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           mle          mean        median       ci.2.5%      ci.97.5% </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           mle          mean        median    ci_lo.2.5%   ci_up.97.5% </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  4.118829e-03  4.102726e-03  4.086742e-03 -3.797545e-05  8.190728e-03 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
