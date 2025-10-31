@@ -76,8 +76,8 @@ central to radiation epidemiology and public health, especially when
 estimating <strong>lifetime</strong> risks across populations and
 exposure scenarios. <strong>CanEpiRisk</strong> provides an integrated R
 framework to: (i) import exposure and demographic inputs, (ii) specify
-risk models—such as <strong>excess relative risk (ERR)</strong> and
-<strong>excess absolute risk (EAR)</strong>—and (iii) compute key
+risk models—such as <strong>excess relative rate (ERR)</strong> and
+<strong>excess absolute rate (EAR)</strong>—and (iii) compute key
 measures including <strong>cumulative excess risk (CER)</strong> and
 <strong>years of life lost (YLL)</strong>. The package streamlines
 end-to-end risk assessment, improves reproducibility, and enables
@@ -98,8 +98,9 @@ profiles.</p>
 <ul>
 <li>
 <strong>Reference data</strong>: Baseline cause-specific rates
-(incidence/mortality) by WHO-like regions plus all-cause mortality.
-Example objects (i=Region ID, 1, 2, …, or 5):
+(incidence/mortality) plus all-cause mortality. Built-in objects
+<code>Mortality</code> and <code>Incidence</code> provide reference data
+for the five WHO global regions. Examples (i=Region ID, 1, 2, …, or 5):
 <ul>
 <li><code>Mortality[[i]]$allsolid</code></li>
 <li><code>Mortality[[i]]$allcause</code></li>
@@ -108,8 +109,11 @@ Example objects (i=Region ID, 1, 2, …, or 5):
 </ul>
 </li>
 <li>
-<strong>Risk models</strong>: LSS-style model lists per
-site/outcome:
+<strong>Risk models</strong>: Risk model lists per site/outcome.
+Built-in objects <code>LSS_mortality</code> and
+<code>LSS_incidence</code> provide information about the models derived
+from mortality and incidence data in the Life Span Study (LSS) cohort
+for various cancer sites.
 <ul>
 <li>
 <code>LSS_mortality$allsolid$L$err</code> (linear ERR)</li>
@@ -134,17 +138,17 @@ EAR)</li>
 </h2>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Define exposure</strong> (ages at exposure, doses,
+<strong>Define exposure scenario</strong> (ages at exposure, doses,
 sex).</li>
 <li>
-<strong>Select reference rates</strong> (site-specific baseline +
+<strong>Select reference data</strong> (site-specific baseline +
 all-cause mortality).</li>
 <li>
 <strong>Choose a risk model</strong> (model appropriate to
 outcome/site).</li>
 <li>
-<strong>Set options</strong> (e.g., follow-up max age, ERR wright
-(vs EAR), Monte Carlo sampling).</li>
+<strong>Set options</strong> (e.g., follow-up max age, weighting
+between ERR vs EAR, Monte Carlo sampling, … etc.).</li>
 <li>
 <strong>Compute</strong> CER / YLL and summarize.</li>
 </ol>
@@ -153,8 +157,7 @@ outcome/site).</li>
 <h2 id="quick-examples">5. Quick Examples<a class="anchor" aria-label="anchor" href="#quick-examples"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://kyojifurukawa.github.io/CanEpiRisk/">CanEpiRisk</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>     <span class="co"># for reproducibility</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>     <span class="co"># for reproducibility</span></span>
 <span></span>
 <span><span class="co">## Example 1: CER for all solid cancer mortality</span></span>
 <span><span class="co">## Region 1, female (sex = 2), 0.1 Gy at age 15, follow to age 100; LSS linear ERR</span></span>
@@ -194,11 +197,10 @@ outcome/site).</li>
 <strong><code>maxage</code></strong>: Upper bound of attained age
 for lifetime accumulation.</li>
 <li>
-<strong><code>err_wgt</code></strong>: Blend ERR and EAR when a
-combined estimate is desired (1 = pure ERR; 0 = pure EAR).</li>
+<strong><code>err_wgt</code></strong>: a value between 0 and 1
+(inclusive; 1 = pure ERR; 0 = pure EAR).</li>
 <li>
-<code>n_mcsamp</code>: Monte Carlo samples (increase for stability
-at small cost).</li>
+<code>n_mcsamp</code>: Monte Carlo samples (default=10,000).</li>
 </ul>
 <p><strong>Comparing Scenarios</strong></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -216,20 +218,7 @@ at small cost).</li>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span> <span class="va">scenario_grid</span>, <span class="va">CER_per10k</span> <span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="troubleshooting">6. Troubleshooting<a class="anchor" aria-label="anchor" href="#troubleshooting"></a>
-</h2>
-<ul>
-<li>
-<strong>Dimension or name mismatches</strong>: Ensure baseline and
-mortality tables align to age/sex structure expected by your model.</li>
-<li>
-<strong>Non-finite outputs</strong>: Check dose units (Gy), age
-ranges (exposure &lt; maxage), and model/site consistency (e.g., using
-an incidence EAR model for mortality outcomes is invalid).</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="see-also">7. See Also<a class="anchor" aria-label="anchor" href="#see-also"></a>
+<h2 id="see-also">6. See Also<a class="anchor" aria-label="anchor" href="#see-also"></a>
 </h2>
 <p><a href="https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_ReferenceData.html" class="external-link">Reference
 data article</a></p>
