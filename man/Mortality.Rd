@@ -32,13 +32,16 @@ For \code{allcause} mortality data.frame contains age-specific person-year data,
  names(Mortality[[1]])  # Sites for which baseline mortality rates are available
 
  # Example 1: All solid cancer mortality rates for Region-1
- Mortality[[1]]$allsolid
+ head( Mortality[[1]]$allsolid )
+ tail( Mortality[[1]]$allsolid )
 
  # Example 2: Leukaemia mortality rates for Region-3
- Mortality[[3]]$leukaemia
+ head( Mortality[[3]]$leukaemia )
+ tail( Mortality[[3]]$leukaemia )
 
  # Example 3: A;;ll;-cause mortality rates for Region-5
- Mortality[[5]]$allcause
+ head( Mortality[[5]]$allcause )
+ tail( Mortality[[5]]$allcause )
 
  # Example 4: plotting lung cancer mortality rates
  plot_refdata( dat=Mortality, outcome="lung", leg_pos=c(0.27,0.95) )

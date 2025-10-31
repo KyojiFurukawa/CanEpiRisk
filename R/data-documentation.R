@@ -23,13 +23,16 @@
 #'  names(Mortality[[1]])  # Sites for which baseline mortality rates are available
 #'
 #'  # Example 1: All solid cancer mortality rates for Region-1
-#'  Mortality[[1]]$allsolid
+#'  head( Mortality[[1]]$allsolid )
+#'  tail( Mortality[[1]]$allsolid )
 #'
 #'  # Example 2: Leukaemia mortality rates for Region-3
-#'  Mortality[[3]]$leukaemia
+#'  head( Mortality[[3]]$leukaemia )
+#'  tail( Mortality[[3]]$leukaemia )
 #'
 #'  # Example 3: A;;ll;-cause mortality rates for Region-5
-#'  Mortality[[5]]$allcause
+#'  head( Mortality[[5]]$allcause )
+#'  tail( Mortality[[5]]$allcause )
 #'
 #'  # Example 4: plotting lung cancer mortality rates
 #'  plot_refdata( dat=Mortality, outcome="lung", leg_pos=c(0.27,0.95) )
@@ -107,13 +110,16 @@
 #'  names(Incidence[[1]])  # Sites for which baseline incidence rates are available
 #'
 #'  # Example 1: All solid cancer incidence rates for Region-1
-#'  Incidence[[1]]$allsolid
+#'  head( Incidence[[1]]$allsolid )
+#'  tail( Incidence[[1]]$allsolid )
 #'
 #'  # Example 2: Leukaemia incidence rates for Region-3
-#'  Incidence[[3]]$leukaemia
+#'  head( Incidence[[3]]$leukaemia )
+#'  tail( Incidence[[3]]$leukaemia )
 #'
 #'  # Example 3: A;;ll;-cause incidence rates for Region-5
-#'  Incidence[[5]]$allcause
+#'  head( Incidence[[5]]$allcause )
+#'  tail( Incidence[[5]]$allcause )
 #'
 #'  # Example 4: plotting lung cancer incidence rates
 #'  plot_refdata( dat=Incidence, outcome="lung", leg_pos=c(0.27,0.95) )

@@ -1,7 +1,7 @@
 Package: CanEpiRisk
 Type: Package
 Title: Calculating Cumulative Excess Risk 
-Version: 0.1.0
+Version: 1.0-0
 Author: Kyoji Furukawa
 Maintainer: Kyoji Furukawa <kjfurukawa@gmail.com>
 Description: Calculate the cumulative excess risk due to radiation exposure.
