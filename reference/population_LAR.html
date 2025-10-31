@@ -92,7 +92,7 @@ sex coding.</p></dd>
 <dd><p>List defining the radiation <strong>risk model</strong>. Typically contains
 sublists for ERR and/or EAR:</p><ul><li><p><code>err</code> / <code>ear</code> — each is a list with:</p><ul><li><p><code>para</code> — numeric vector of model parameters;</p></li>
 <li><p><code>var</code> — parameter variance–covariance matrix (for multi-parameter models), <em>or</em>
-<code>ci</code> — length-2 95\<!-- % bounds for one-parameter models; --></p></li>
+<code>ci</code> — confidence bounds for one-parameter models;</p></li>
 <li><p><code>f</code> — function of the form <code>f(beta, data, lag)</code> returning age-specific
 excess risk given parameters and data (dose, ages, sex).</p></li>
 </ul></li>
@@ -134,8 +134,7 @@ drawing model parameters either from a variance–covariance matrix (<code>var</
 in one-parameter models, from 95% confidence bounds (<code>ci</code>) when provided.</p>
 <p>Results are reported <strong>per <code>PER</code> persons</strong> (default: per 10,000). The default
 <code>agex = 1:8 * 10 - 5</code> corresponds to midpoint ages 5, 15, …, 75, i.e.,
-exposure categories 0–10, 10–20, …, 70–80 years, matching the examples in the
-package reference.</p>
+exposure categories 0–10, 10–20, …, 70–80 years, which should match the categories of <code>agedist</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="units-amp-alignment">Units &amp; Alignment<a class="anchor" aria-label="anchor" href="#units-amp-alignment"></a></h2>

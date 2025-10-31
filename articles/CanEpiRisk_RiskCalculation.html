@@ -184,8 +184,8 @@ LSS/INWORKS style objects
 <span><span class="co"># CER (per 10,000 persons)</span></span>
 <span><span class="va">cer1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CER.html">CER</a></span><span class="op">(</span>exposure <span class="op">=</span> <span class="va">exp1</span>, reference <span class="op">=</span> <span class="va">ref1</span>, riskmodel <span class="op">=</span> <span class="va">mod1</span>, option <span class="op">=</span> <span class="va">opt1</span><span class="op">)</span></span>
 <span><span class="va">cer1</span> <span class="op">*</span> <span class="fl">10000</span></span>
-<span><span class="co">#&gt;      mle     mean   median  ci.2.5% ci.97.5% </span></span>
-<span><span class="co">#&gt; 156.0667 158.4113 155.9330 115.0978 214.6693</span></span></code></pre></div>
+<span><span class="co">#&gt;         mle        mean      median  ci_lo.2.5% ci_up.97.5% </span></span>
+<span><span class="co">#&gt;    156.0667    158.4113    155.9330    115.0978    214.6693</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="leukaemia-incidence-ear-model-lss-lq">3.2 Leukaemia incidence (EAR model; LSS LQ)<a class="anchor" aria-label="anchor" href="#leukaemia-incidence-ear-model-lss-lq"></a>
@@ -204,8 +204,8 @@ LSS/INWORKS style objects
 <span></span>
 <span><span class="va">cer2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CER.html">CER</a></span><span class="op">(</span>exposure <span class="op">=</span> <span class="va">exp2</span>, reference <span class="op">=</span> <span class="va">ref2</span>, riskmodel <span class="op">=</span> <span class="va">mod2</span>, option <span class="op">=</span> <span class="va">opt2</span><span class="op">)</span></span>
 <span><span class="va">cer2</span> <span class="op">*</span> <span class="fl">10000</span></span>
-<span><span class="co">#&gt;        mle       mean     median    ci.2.5%   ci.97.5% </span></span>
-<span><span class="co">#&gt; 3.68374227 3.66876471 3.63603307 0.05966926 7.39791682</span></span></code></pre></div>
+<span><span class="co">#&gt;         mle        mean      median  ci_lo.2.5% ci_up.97.5% </span></span>
+<span><span class="co">#&gt;   3.6837423   3.6450825   3.6131432   0.1187444   7.2777762</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="years-of-life-lost-yll">3.3 Years of Life Lost (YLL)<a class="anchor" aria-label="anchor" href="#years-of-life-lost-yll"></a>
@@ -214,8 +214,8 @@ LSS/INWORKS style objects
 <code class="sourceCode R"><span><span class="co"># Same inputs; YLL returns expected years-of-life lost attributable to exposure</span></span>
 <span><span class="va">yll1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/YLL.html">YLL</a></span><span class="op">(</span>exposure <span class="op">=</span> <span class="va">exp1</span>, reference <span class="op">=</span> <span class="va">ref1</span>, riskmodel <span class="op">=</span> <span class="va">mod1</span>, option <span class="op">=</span> <span class="va">opt1</span><span class="op">)</span></span>
 <span><span class="va">yll1</span></span>
-<span><span class="co">#&gt;       mle      mean    median   ci.2.5%  ci.97.5% </span></span>
-<span><span class="co">#&gt; 0.2408580 0.2439038 0.2421660 0.1883518 0.3081081</span></span></code></pre></div>
+<span><span class="co">#&gt;         mle        mean      median  ci_lo.2.5% ci_up.97.5% </span></span>
+<span><span class="co">#&gt;   0.2408580   0.2439038   0.2421660   0.1883518   0.3081081</span></span></code></pre></div>
 <blockquote>
 <p><strong>Interpreting outputs.</strong> Functions typically return
 point summaries (MLE/mean/median) and percentile intervals when
@@ -336,7 +336,7 @@ derived from the INWORKS cohort for mortality from all solid cancer
 <span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="va">INWORKS_mortality</span><span class="op">$</span><span class="va">allsolid</span><span class="op">$</span><span class="va">L</span>                       <span class="co"># risk model</span></span>
 <span><span class="va">opt1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> maxage<span class="op">=</span><span class="fl">100</span>, err_wgt<span class="op">=</span><span class="fl">1</span>, n_mcsamp<span class="op">=</span><span class="fl">10000</span> <span class="op">)</span>  <span class="co"># option</span></span>
 <span><span class="fu"><a href="../reference/CER.html">CER</a></span><span class="op">(</span>  exposure<span class="op">=</span><span class="va">exp1</span>, reference<span class="op">=</span><span class="va">ref1</span>, riskmodel<span class="op">=</span><span class="va">mod1</span>, option<span class="op">=</span><span class="va">opt1</span> <span class="op">)</span> <span class="op">*</span> <span class="fl">10000</span> <span class="co"># cases per 10,000</span></span>
-<span><span class="co">#&gt;       mle      mean    median       ci1       ci2 </span></span>
+<span><span class="co">#&gt;       mle      mean    median     ci_lo     ci_up </span></span>
 <span><span class="co">#&gt;  78.57894  78.57894  78.57894  23.27948 142.46409</span></span>
 <span></span>
 <span><span class="co"># (2) Leukaemia incidence, Region-4, male, 6.7(100/15)mGy at ages 30-45, followed up to age 60, INWORKS EAR</span></span>
@@ -346,7 +346,7 @@ derived from the INWORKS cohort for mortality from all solid cancer
 <span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">INWORKS_mortality</span><span class="op">$</span><span class="va">leukaemia</span><span class="op">$</span><span class="va">L</span>                            <span class="co"># risk model</span></span>
 <span><span class="va">opt2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> maxage<span class="op">=</span><span class="fl">60</span>, err_wgt<span class="op">=</span><span class="fl">0</span>, n_mcsamp<span class="op">=</span><span class="fl">10000</span><span class="op">)</span>    <span class="co"># option</span></span>
 <span><span class="fu"><a href="../reference/CER.html">CER</a></span><span class="op">(</span>  exposure<span class="op">=</span><span class="va">exp2</span>, reference<span class="op">=</span><span class="va">ref2</span>, riskmodel<span class="op">=</span><span class="va">mod2</span>, option<span class="op">=</span><span class="va">opt2</span> <span class="op">)</span> <span class="op">*</span> <span class="fl">10000</span> <span class="co"># cases per 10,000</span></span>
-<span><span class="co">#&gt;      mle     mean   median      ci1      ci2 </span></span>
+<span><span class="co">#&gt;      mle     mean   median    ci_lo    ci_up </span></span>
 <span><span class="co">#&gt; 4.445936 4.445936 4.445936 1.000643 8.875002</span></span></code></pre></div>
 <hr>
 </div>

@@ -78,7 +78,7 @@ with columns <code>age</code>, <code>male</code>, <code>female</code> on ages 1:
 <dd><p>list. Radiation risk model definition with sublists for
 <em>excess relative risk</em> (ERR) and <em>excess absolute risk</em> (EAR), e.g.:</p><ul><li><p><code>err</code>/<code>ear</code>: each a list containing
 <code>para</code> (numeric parameter vector),
-<code>var</code> (variance–covariance matrix) <em>or</em> <code>ci</code> (length-2 95\<!-- % CI for -->
+<code>var</code> (variance–covariance matrix) <em>or</em> <code>ci</code> (confidence interval for
 1-parameter models), and
 <code>f</code> (function of the form <code>f(beta, data, lag)</code> returning age-specific excess risk).</p></li>
 </ul></dd>
@@ -98,7 +98,7 @@ intermediate values allowed).</p></li>
     <p>A named numeric vector with point and interval summaries of cumulative excess risk,
 typically including:</p><ul><li><p><code>mle</code>: point estimate,</p></li>
 <li><p><code>mean</code>, <code>median</code>: Monte Carlo summaries,</p></li>
-<li><p><code>ci.2.5%</code>, <code>ci.97.5%</code>: 95% interval bounds.</p></li>
+<li><p><code>ci_lo</code>, <code>ci_up</code>: confidence intervals.</p></li>
 </ul><p>Values are per person; multiply by <code>1e4</code> or <code>1e5</code> to report per 10,000 or 100,000.</p>
     </div>
     <div class="section level2">
@@ -138,8 +138,8 @@ population/region and aligned on age (1–100) and sex coding.</p>
 <span class="r-in"><span><span class="va">opt1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxage <span class="op">=</span> <span class="fl">100</span>, err_wgt <span class="op">=</span> <span class="fl">1</span>, n_mcsamp <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">CER</span><span class="op">(</span>exposure <span class="op">=</span> <span class="va">exp1</span>, reference <span class="op">=</span> <span class="va">ref1</span>, riskmodel <span class="op">=</span> <span class="va">mod1</span>, option <span class="op">=</span> <span class="va">opt1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">10000</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      mle     mean   median  ci.2.5% ci.97.5% </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 156.0667 158.3529 156.4740 114.7944 214.0962 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         mle        mean      median  ci_lo.2.5% ci_up.97.5% </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    156.0667    158.3529    156.4740    114.7944    214.0962 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Leukaemia incidence (Region 4), male, 100 mGy evenly across ages 30–45</span></span></span>
 <span class="r-in"><span><span class="va">exp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>agex <span class="op">=</span> <span class="fl">30</span><span class="op">:</span><span class="fl">44</span> <span class="op">+</span> <span class="fl">0.5</span>, doseGy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">/</span><span class="fl">15</span>, <span class="fl">15</span><span class="op">)</span>, sex <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
@@ -151,8 +151,8 @@ population/region and aligned on age (1–100) and sex coding.</p>
 <span class="r-in"><span><span class="va">opt2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxage <span class="op">=</span> <span class="fl">60</span>, err_wgt <span class="op">=</span> <span class="fl">0</span>, n_mcsamp <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">CER</span><span class="op">(</span>exposure <span class="op">=</span> <span class="va">exp2</span>, reference <span class="op">=</span> <span class="va">ref2</span>, riskmodel <span class="op">=</span> <span class="va">mod2</span>, option <span class="op">=</span> <span class="va">opt2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">10000</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         mle        mean      median     ci.2.5%    ci.97.5% </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3.68374227  3.62558094  3.63197695 -0.06062042  7.27448084 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         mle        mean      median  ci_lo.2.5% ci_up.97.5% </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3.68374227  3.67452642  3.66978576 -0.03348263  7.32048046 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
