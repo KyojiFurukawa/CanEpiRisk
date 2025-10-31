@@ -62,7 +62,7 @@ sampling.
 Let \code{agedist} denote the population age distribution (grouped
 ages) and \code{baseline}/\code{mortality} denote site-specific baseline rates and
 all-cause mortality for the same region/population and sex coding. For each
-age-at-exposure category in \code{agex}, \code{population_LAR()} evaluates LAR under
+age-at-exposure category in \code{agex}, \code{population_YLL()} evaluates YLL under
 the supplied risk model(s) and then averages across the age structure, returning
 sex-specific estimates and an \code{all}-sex average. Uncertainty is obtained by
 drawing model parameters either from a variance–covariance matrix (\code{var}) or,

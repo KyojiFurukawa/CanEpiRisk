@@ -17,7 +17,7 @@ sampling."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">CanEpiRisk</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0-0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,7 +114,7 @@ Each component is a data frame with one row per exposure age category (rows name
     <p>Let <code>agedist</code> denote the population age distribution (grouped
 ages) and <code>baseline</code>/<code>mortality</code> denote site-specific baseline rates and
 all-cause mortality for the same region/population and sex coding. For each
-age-at-exposure category in <code>agex</code>, <code><a href="population_LAR.html">population_LAR()</a></code> evaluates LAR under
+age-at-exposure category in <code>agex</code>, <code>population_YLL()</code> evaluates YLL under
 the supplied risk model(s) and then averages across the age structure, returning
 sex-specific estimates and an <code>all</code>-sex average. Uncertainty is obtained by
 drawing model parameters either from a variance–covariance matrix (<code>var</code>) or,
