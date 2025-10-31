@@ -21,7 +21,7 @@ library(CanEpiRisk)
 
 ## 1. Overview
 
-Quantifying cancer risks associated with ionizing radiation is central to radiation epidemiology and public health, especially when estimating **lifetime** risks across populations and exposure scenarios. **CanEpiRisk** provides an integrated R framework to: (i) import exposure and demographic inputs, (ii) specify risk models—such as **excess relative risk (ERR)** and **excess absolute risk (EAR)**—and (iii) compute key measures including **cumulative excess risk (CER)** and **years of life lost (YLL)**. The package streamlines end-to-end risk assessment, improves reproducibility, and enables transparent comparisons across models, populations, and exposure profiles.
+Quantifying cancer risks associated with ionizing radiation is central to radiation epidemiology and public health, especially when estimating **lifetime** risks across populations and exposure scenarios. **CanEpiRisk** provides an integrated R framework to: (i) import exposure and demographic inputs, (ii) specify risk models—such as **excess relative rate (ERR)** and **excess absolute rate (EAR)**—and (iii) compute key measures including **cumulative excess risk (CER)** and **years of life lost (YLL)**. The package streamlines end-to-end risk assessment, improves reproducibility, and enables transparent comparisons across models, populations, and exposure profiles.
 
 ## 2. Installation
 
@@ -33,11 +33,11 @@ library(CanEpiRisk)
 
 ## 3. Data & Model Components
 
-- **Reference data**: Baseline cause-specific rates (incidence/mortality) by WHO-like regions plus all-cause mortality. Example objects (i=Region ID, 1, 2, ..., or 5):
+- **Reference data**: Baseline cause-specific rates (incidence/mortality) plus all-cause mortality. Built-in objects `Mortality` and `Incidence` provide reference data for the five WHO global regions. Examples (i=Region ID, 1, 2, ..., or 5):
   - `Mortality[[i]]$allsolid` 
   - `Mortality[[i]]$allcause`
   - `Incidence[[i]]$leukaemia` (etc.)
-- **Risk models**: LSS-style model lists per site/outcome:
+- **Risk models**: Risk model lists per site/outcome. Built-in objects `LSS_mortality` and `LSS_incidence` provide information about the models derived from mortality and incidence data in the Life Span Study (LSS) cohort for various cancer sites.
   - `LSS_mortality$allsolid$L$err` (linear ERR)
   - `LSS_incidence$leukaemia$LQ$ear` (linear-quadratic EAR)
 
@@ -49,16 +49,15 @@ See companion articles:
 
 ## 4. Typical Workflow
 
-1. **Define exposure** (ages at exposure, doses, sex).
-2. **Select reference rates** (site-specific baseline + all-cause mortality).
+1. **Define exposure scenario** (ages at exposure, doses, sex).
+2. **Select reference data** (site-specific baseline + all-cause mortality).
 3. **Choose a risk model** (model appropriate to outcome/site).
-4. **Set options** (e.g., follow-up max age, ERR wright (vs EAR), Monte Carlo sampling).
+4. **Set options** (e.g., follow-up max age, weighting between ERR vs EAR, Monte Carlo sampling, ... etc.).
 5. **Compute** CER / YLL and summarize.
 
 ## 5. Quick Examples
 
 ```r
-library(CanEpiRisk)
 set.seed(100)     # for reproducibility
 
 ## Example 1: CER for all solid cancer mortality
@@ -98,8 +97,8 @@ cer2_per10k
 - `sex`: commonly `1 = male`, `2 = female`. 
 - Region indices follow the package’s WHO regional ordering.
 - **`maxage`**: Upper bound of attained age for lifetime accumulation.
-- **`err_wgt`**: Blend ERR and EAR when a combined estimate is desired (1 = pure ERR; 0 = pure EAR).
-- `n_mcsamp`: Monte Carlo samples (increase for stability at small cost).
+- **`err_wgt`**: a value between 0 and 1 (inclusive; 1 = pure ERR; 0 = pure EAR).
+- `n_mcsamp`: Monte Carlo samples (default=10,000).
 
 **Comparing Scenarios**
 
@@ -118,12 +117,8 @@ CER_per10k <- t( mapply(compareCER, scenario_grid$doseGy, scenario_grid$agex) )
 cbind( scenario_grid, CER_per10k )
 ```
 
-## 6. Troubleshooting
 
-- **Dimension or name mismatches**: Ensure baseline and mortality tables align to age/sex structure expected by your model.
-- **Non-finite outputs**: Check dose units (Gy), age ranges (exposure < maxage), and model/site consistency (e.g., using an incidence EAR model for mortality outcomes is invalid).
-
-## 7. See Also
+## 6. See Also
 
 [Reference data article](https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_ReferenceData.html)
 
