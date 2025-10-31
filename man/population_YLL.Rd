@@ -24,6 +24,7 @@ estimated risk information (list)
 Calculate the population-averaged years of life lost due to radiation exposure.
 }
 \examples{
+ set.seed(100)
  # The following examples use default data provided in CanEpiRisk package
  # for riskmodels (LSS_mortality) derived from Life Span Study
  #     baseline rates and age distribution for WHO riskmodels (Mortality, agedist_rgn)

@@ -55,7 +55,6 @@ Compute the \strong{cumulative excess risk (CER)} attributable to radiation expo
 individual scenario or cohort, integrating excess risks over age up to a specified
 maximum while accounting for competing all-cause mortality and model uncertainty.
 This is the core engine for lifetime risk estimation in \strong{CanEpiRisk}.
-:contentReference[oaicite:0]{index=0}
 }
 \details{
 Calculating Cumulative Excess Risks (CER)
@@ -72,7 +71,7 @@ the same age grid and sex coding.
 \section{Units & Alignment}{
 
 Doses must be in Gy. Ensure \code{baseline} and \code{mortality} tables are from the same
-population/region and aligned on age (1–100) and sex coding. :contentReference[oaicite:1]{index=1}
+population/region and aligned on age (1–100) and sex coding.
 }
 
 \examples{
@@ -102,5 +101,5 @@ CER(exposure = exp2, reference = ref2, riskmodel = mod2, option = opt2) * 10000
 
 }
 \seealso{
-\link{population_LAR}, \link{YLL}
+\code{\link{population_LAR}}, \code{\link{population_YLL}}, \code{\link{YLL}}
 }
