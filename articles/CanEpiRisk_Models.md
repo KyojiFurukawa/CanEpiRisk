@@ -63,8 +63,8 @@ LSS_mortality$allsolid$L$err$f       # ERR function
 #>               exp(beta[1])*data$dose * exp(beta[2] * (data$agex - 30)/10 + beta[3] * log(data$age/70)) *
 #>            (1 + c(-1, 1)[data$sex] * beta[4]) * (data$age - data$agex >= lag )
 #>        }
-#> <bytecode: 0x5646f1e70678>
-#> <environment: 0x5646f1e71558>
+#> <bytecode: 0x562292d79bd8>
+#> <environment: 0x562292d7aab8>
 ```
 
 Plot an example (all solid, **linear ERR**):

@@ -214,7 +214,7 @@ survivors, 1958-2009. Eur J Epidemiol 35(6): 591-600 (2020).
 #>                     ( beta[1]*data$dose + beta[2]*data$dose^2) * 
 #>                         exp( beta[3]*log(data$age/70) + beta[4]*log((tsx)/40) ) * (tsx >= lag)
 #>            }
-#> <bytecode: 0x5603c94a7840>
+#> <bytecode: 0x55816d56bb08>
 #> 
  LSS_incidence$lung$L$err         # Linear ERR model for thyroid cancer incidence
 #> $para
