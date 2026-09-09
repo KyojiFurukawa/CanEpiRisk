@@ -97,7 +97,7 @@
 CER <- function( exposure, reference, riskmodel, option )
 {
   # update on 2026/09/09 ----
-
+  aaa <- 100
   if( is.null(option$alpha) ) option$alpha <- 0.05  # alpha error (required for specifying the level of confidence interval)
   mle_CER  <- mc_CER(  exposure, reference, riskmodel, option=list(mle_only=T, maxage=option$maxage, err_wgt=option$err_wgt ) )
   if( is.null( riskmodel$err$var )  ){  # If riskmodel has only a single err/ear parameter with a confidence interval...
