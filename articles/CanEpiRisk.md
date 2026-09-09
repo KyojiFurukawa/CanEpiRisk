@@ -1,0 +1,135 @@
+# CanEpiRisk
+
+## 1. Overview
+
+Quantifying cancer risks associated with ionizing radiation is central
+to radiation epidemiology and public health, especially when estimating
+**lifetime** risks across populations and exposure scenarios.
+**CanEpiRisk** provides an integrated R framework to: (i) import
+exposure and demographic inputs, (ii) specify risk models—such as
+**excess relative rate (ERR)** and **excess absolute rate (EAR)**—and
+(iii) compute key measures including **cumulative excess risk (CER)**
+and **years of life lost (YLL)**. The package streamlines end-to-end
+risk assessment, improves reproducibility, and enables transparent
+comparisons across models, populations, and exposure profiles.
+
+## 2. Installation
+
+``` r
+
+# install.packages("devtools")
+devtools::install_github("KyojiFurukawa/CanEpiRisk")
+library(CanEpiRisk)
+```
+
+## 3. Data & Model Components
+
+- **Reference data**: Baseline cause-specific rates
+  (incidence/mortality) plus all-cause mortality. Built-in objects
+  `Mortality` and `Incidence` provide reference data for the five WHO
+  global regions. Examples (i=Region ID, 1, 2, …, or 5):
+  - `Mortality[[i]]$allsolid`
+  - `Mortality[[i]]$allcause`
+  - `Incidence[[i]]$leukaemia` (etc.)
+- **Risk models**: Risk model lists per site/outcome. Built-in objects
+  `LSS_mortality` and `LSS_incidence` provide information about the
+  models derived from mortality and incidence data in the Life Span
+  Study (LSS) cohort for various cancer sites.
+  - `LSS_mortality$allsolid$L$err` (linear ERR)
+  - `LSS_incidence$leukaemia$LQ$ear` (linear-quadratic EAR)
+
+See companion articles:
+
+- Reference data:
+  <https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_ReferenceData.html>  
+- Risk models:
+  <https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_Models.html>  
+- Risk calculation:
+  <https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_RiskCalculation.html>
+
+## 4. Typical Workflow
+
+1.  **Define exposure scenario** (ages at exposure, doses, sex).
+2.  **Select reference data** (site-specific baseline + all-cause
+    mortality).
+3.  **Choose a risk model** (model appropriate to outcome/site).
+4.  **Set options** (e.g., follow-up max age, weighting between ERR vs
+    EAR, Monte Carlo sampling, … etc.).
+5.  **Compute** CER / YLL and summarize.
+
+## 5. Quick Examples
+
+``` r
+
+set.seed(100)     # for reproducibility
+
+## Example 1: CER for all solid cancer mortality
+## Region 1, female (sex = 2), 0.1 Gy at age 15, follow to age 100; LSS linear ERR
+exp1 <- list(agex = 15, doseGy = 0.1, sex = 2)   # exposure scenario
+ref1 <- list(
+  baseline  = Mortality[[1]]$allsolid,          # site-specific baseline
+  mortality = Mortality[[1]]$allcause           # all-cause mortality
+)
+mod1 <- LSS_mortality$allsolid$L                # risk model (linear ERR)
+opt1 <- list(maxage = 100, err_wgt = 1, n_mcsamp = 10000)
+
+cer1 <- CER(exposure = exp1, reference = ref1, riskmodel = mod1, option = opt1)
+cer1_per10k <- cer1 * 10000
+cer1_per10k
+```
+
+``` r
+
+## Example 2: CER for leukaemia incidence
+## Region 4, male (sex = 1), 100 mGy total delivered evenly from age 30–45,
+## follow to age 60; LSS LQ EAR
+exp2 <- list(agex = 30:44 + 0.5, doseGy = rep(0.1/15, 15), sex = 1)
+ref2 <- list(
+  baseline  = Incidence[[4]]$leukaemia,         # site-specific baseline
+  mortality = Mortality[[4]]$allcause           # all-cause mortality rates
+)
+mod2 <- LSS_incidence$leukaemia$LQ              # risk model (LQ EAR)
+opt2 <- list(maxage = 60, err_wgt = 0, n_mcsamp = 10000)
+
+cer2 <- CER(exposure = exp2, reference = ref2, riskmodel = mod2, option = opt2)
+cer2_per10k <- cer2 * 10000
+cer2_per10k
+```
+
+**Notes.**
+
+- `sex`: commonly `1 = male`, `2 = female`.
+- Region indices follow the package’s WHO regional ordering.
+- **`maxage`**: Upper bound of attained age for lifetime accumulation.
+- **`err_wgt`**: a value between 0 and 1 (inclusive; 1 = pure ERR; 0 =
+  pure EAR).
+- `n_mcsamp`: Monte Carlo samples (default=10,000).
+
+**Comparing Scenarios**
+
+``` r
+
+scenario_grid <- data.frame(
+  doseGy = c(0.05, 0.1, 0.2),
+  agex   = c(15, 30, 45)
+)
+
+compareCER <- function(doseGy, agex) {
+  exp <- list(agex = agex, doseGy = doseGy, sex = 2)
+  CER(exposure = exp, reference = ref1, riskmodel = mod1, option = opt1) * 10000
+}
+
+CER_per10k <- t( mapply(compareCER, scenario_grid$doseGy, scenario_grid$agex) )
+cbind( scenario_grid, CER_per10k )
+```
+
+## 6. See Also
+
+[Reference data
+article](https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_ReferenceData.html)
+
+[Model specification
+article](https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_Models.html)
+
+[Risk calculation
+article](https://KyojiFurukawa.github.io/CanEpiRisk/articles/CanEpiRisk_RiskCalculation.html)

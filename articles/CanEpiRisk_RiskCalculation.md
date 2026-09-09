@@ -1,0 +1,285 @@
+# Calculating cumulative excess risks
+
+## Installation
+
+``` r
+
+library(CanEpiRisk)
+```
+
+## 1. Overview
+
+With an **exposure scenario**, **baseline reference data**, and a **risk
+model**, `CanEpiRisk` computes:
+
+- **Cumulative Excess Risk (CER)** via
+  [`CER()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/CER.md)  
+- **Years of Life Lost (YLL)** via
+  [`YLL()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/YLL.md)  
+- Population-averaged versions via
+  [`population_LAR()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/population_LAR.md)
+  and
+  [`population_YLL()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/population_YLL.md)
+
+------------------------------------------------------------------------
+
+## 2. Inputs at a Glance
+
+1.  **Exposure** (`exposure`; list): attained-age grid is implicit (ages
+    1–100). Key fields
+    - `agex`: age(s) at exposure (scalar or vector)
+    - `doseGy`: dose(s) in Gy (same length as `agex` if vectorized)
+    - `sex`: typically `1 = male`, `2 = female`
+2.  **Reference** (`reference`; list): region/site-specific tables
+    - `baseline`: site-specific baseline **incidence** or **mortality**
+      (per person-year) on ages 1–100
+    - `mortality`: **all-cause mortality** (per person-year) on ages
+      1–100
+3.  **Risk model** (`riskmodel`; list): e.g., LSS/INWORKS style objects
+    - For packaged LSS models: `LSS_mortality$<site>$L`,
+      `LSS_incidence$<site>$LQ`, etc.
+    - For user models: see §5
+4.  **Options** (`option`; list):
+    - `maxage`: upper bound of attained age for accumulation (e.g., 100)
+    - `err_wgt`: blend **ERR** vs **EAR** (1 = pure ERR; 0 = pure EAR)
+    - `n_mcsamp`: Monte Carlo sample size for uncertainty (e.g., 10000)
+
+> **Units & alignment.** Keep dose in Gy; ensure `baseline` and
+> `mortality` come from the **same region/population** and are
+> age-aligned (ages 1–100).
+
+------------------------------------------------------------------------
+
+## 3. Quick Start: CER and YLL
+
+### 3.1 All solid cancer mortality (ERR model; LSS)
+
+``` r
+
+set.seed(123)
+
+# Exposure scenario: 0.1 Gy at age 15, female, track to age 100
+exp1 <- list(agex = 15, doseGy = 0.1, sex = 2)
+
+# Region 1 reference (example)
+ref1 <- list(
+  baseline  = Mortality[[1]]$allsolid,  # site-specific baseline mortality
+  mortality = Mortality[[1]]$allcause   # all-cause mortality
+)
+
+# LSS linear ERR model for all-solid mortality
+mod1 <- LSS_mortality$allsolid$L
+
+# Tuning options
+opt1 <- list(maxage = 100, err_wgt = 1, n_mcsamp = 10000)
+
+# CER (per 10,000 persons)
+cer1 <- CER(exposure = exp1, reference = ref1, riskmodel = mod1, option = opt1)
+cer1 * 10000
+#>         mle        mean      median  ci_lo.2.5% ci_up.97.5% 
+#>    156.0667    158.4113    155.9330    115.0978    214.6693
+```
+
+### 3.2 Leukaemia incidence (EAR model; LSS LQ)
+
+``` r
+
+# Dose delivered evenly across ages 30–45 (15 yearly bins), male
+exp2 <- list(agex = 30:44 + 0.5, doseGy = rep(0.1/15, 15), sex = 1)
+
+ref2 <- list(
+  baseline  = Incidence[[4]]$leukaemia,  # site-specific baseline incidence
+  mortality = Mortality[[4]]$allcause    # all-cause mortality
+)
+
+mod2 <- LSS_incidence$leukaemia$LQ
+opt2 <- list(maxage = 60, err_wgt = 0, n_mcsamp = 10000)
+
+cer2 <- CER(exposure = exp2, reference = ref2, riskmodel = mod2, option = opt2)
+cer2 * 10000
+#>         mle        mean      median  ci_lo.2.5% ci_up.97.5% 
+#>  3.68374227  3.66876471  3.63603307  0.05966926  7.39791682
+```
+
+### 3.3 Years of Life Lost (YLL)
+
+``` r
+
+# Same inputs; YLL returns expected years-of-life lost attributable to exposure
+yll1 <- YLL(exposure = exp1, reference = ref1, riskmodel = mod1, option = opt1)
+yll1
+#>         mle        mean      median  ci_lo.2.5% ci_up.97.5% 
+#>   0.2408580   0.2439038   0.2421660   0.1883518   0.3081081
+```
+
+> **Interpreting outputs.** Functions typically return point summaries
+> (MLE/mean/median) and percentile intervals when simulation is used.
+> Report the **scale** (e.g., per person vs per 10,000) and **follow-up
+> window** (`maxage`).
+
+------------------------------------------------------------------------
+
+## 4. Population-Averaged Metrics
+
+When you have population age/sex distributions and exposure
+distributions, use:
+
+``` r
+
+# LAR (lifetime attributable risk) and YLL at the population level
+# Example 1: allsolid mortality, Region-1, exposed to 0.1 Gy, followed up to age 100, LSS linear ERR
+ ref1 <- list(  baseline=Mortality[[1]]$allsolid,     # baseline rates
+               mortality=Mortality[[1]]$allcause,     # allcause mortality
+                 agedist=agedist_rgn[[1]] )           # age distribution
+ mod1 <- LSS_mortality$allsolid$L                     # risk model
+ population_LAR( dsGy=0.1, reference=ref1, riskmodel=mod1 )    # CER cases per 10,000
+
+ # Example 2: leukaemia incidence, Region-4, exposed to 0.1 Gy, followed up to age 100, LSS LQ ERR
+ ref2 <- list(  baseline=Incidence[[4]]$leukaemia,    # baseline rates
+               mortality=Mortality[[4]]$allcause,     # all-cause mortality
+                 agedist=agedist_rgn[[4]] )           # age distribution
+ mod2 <- LSS_incidence$leukaemia$LQ                   # risk model
+ population_LAR( dsGy=0.1, reference=ref2, riskmodel=mod2 )    # CER cases per 10,000
+```
+
+Where - `agedist_rgn` encodes the population structure of WHO global
+regions.
+
+------------------------------------------------------------------------
+
+## 5. Using Your Own Risk Models
+
+A risk model object for an endpoint (site-specific incidence or
+mortality) is a **list** with sublists for ERR/EAR, each containing:
+
+- `para`: vector of parameter estimates  
+- `var`: variance–covariance matrix **or** (for 1-parameter models)
+  `ci`: 95% confidence bounds  
+- `f`: function implementing the risk as a function of parameters and
+  data, e.g.
+  `function(beta, data, lag = 10) { beta[1] * data$dose * (data$age - data$agex >= lag) }`
+
+Example skeleton (ERR, single parameter with CI bounds):
+
+``` r
+
+MyRiskmodel <- list()
+MyRiskmodel$allsolid <- list()
+MyRiskmodel$allsolid$L <- list(
+  err = list(
+    para = c(0.47),
+    ci   = c(0.14, 0.85),
+    f    = function(beta, data, lag = 10) {
+      beta[1] * data$dose * (data$age - data$agex >= lag)
+    }
+  )
+)
+```
+
+When a risk model has **one parameter** and includes `ci`,
+[`CER()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/CER.md)
+uses the CI directly to form uncertainty intervals; otherwise it uses
+`var` to sample. The following example shows how to specify and using a
+one-parameter model derived from the INWORKS cohort for mortality from
+all solid cancer (Richardson et al., 2015) and from leukaemia (Leuraud
+et al., 2015).
+
+``` r
+
+INWORKS_mortality <- NULL
+INWORKS_mortality$allsolid <- NULL
+
+INWORKS_mortality$allsolid$L <- list(
+     err=list(
+       para=c(0.47),                  # ERR/Gy=0.47 (90% CI: 0.18,0.79)  
+       ci= c(0.1392403, 0.8521128),   #  95% CI coverted from 90%CI by Weibull approx.
+       f=function (beta, data, lag=10) {
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+       }
+       ),
+      ear=list(    # dummry object
+       para=c(4.8/10000),
+       ci= c(0.1068428, 12.5703871)/10000,
+       f=function (beta, data, lag=10) {
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+       } 
+       )
+ 
+  )
+
+INWORKS_mortality$leukaemia$L <- list(
+     err=list(
+       para=c(2.96),                         # ERR/Gy=2.96 (90% CI: 1.17, 5.21) 
+       ci= c(0.8664, 5.6940),
+       f=function (beta, data, lag=2) {
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+       }
+       ),
+      ear=list(    # dummry object
+       para=c(2.25/10000),
+       ci=c(0.5064054, 4.4914628)/10000,
+       f=function (beta, data, lag=2) {
+           beta[1] * data$dose  * (data$age - data$agex >= lag )
+       } 
+       )
+  )
+
+# Cumulative excess risk (CER) calculations 
+# (1) All solid cancer mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, INWORKS linear ERR
+exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
+ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
+             mortality=Mortality[[1]]$allcause )       # all-cause mortality
+mod1 <- INWORKS_mortality$allsolid$L                       # risk model
+opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
+CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
+#>       mle      mean    median     ci_lo     ci_up 
+#>  78.57894  78.57894  78.57894  23.27948 142.46409
+
+# (2) Leukaemia incidence, Region-4, male, 6.7(100/15)mGy at ages 30-45, followed up to age 60, INWORKS EAR
+exp2 <- list( agex=30:44+0.5, doseGy=rep(0.1/15,15), sex=1 )
+ref2 <- list( baseline=Incidence[[4]]$leukaemia,       # baseline rates
+             mortality=Mortality[[4]]$allcause )       # all-cause mortality rates
+mod2 <- INWORKS_mortality$leukaemia$L                            # risk model
+opt2 <- list( maxage=60, err_wgt=0, n_mcsamp=10000)    # option
+CER(  exposure=exp2, reference=ref2, riskmodel=mod2, option=opt2 ) * 10000 # cases per 10,000
+#>      mle     mean   median    ci_lo    ci_up 
+#> 4.445936 4.445936 4.445936 1.000643 8.875002
+```
+
+------------------------------------------------------------------------
+
+## 6. Notes
+
+- **`maxage`**: Ensure `max(exposure$agex) < maxage`.
+- **`err_wgt`**: Use **1** for pure ERR, **0** for pure EAR, or
+  intermediate values if a combined measure is justified.
+- **`n_mcsamp`**: Increase for smoother interval estimates; reduce for
+  quick prototyping.
+- **`lag`**: Implemented within your model’s `f()`; typical values
+  differ by site (e.g., 5 years for solid cancers vs 2 years for
+  leukaemia).  
+- **Scaling**: Multiply by `1e4` (or `1e5`) to report per 10,000 (or per
+  100,000).
+- `doseGy >= 0`, consistent vector lengths for `agex`/`doseGy` when
+  vectorized, `sex ∈ {1,2}`.
+- **Model–endpoint match**: Do not mix incidence models with mortality
+  baselines (and vice versa).
+
+------------------------------------------------------------------------
+
+## References
+
+Richardson, D.B., E. Cardis, R.D. Daniels et al. Risk of cancer from
+occupational exposure to ionising radiation: retrospective cohort study
+of workers in France, the United Kingdom, and the United States
+(INWORKS). BMJ 351: h5359 (2015).
+
+Richardson, D.B., K. Leuraud, D. Laurier et al. Cancer mortality after
+low dose exposure to ionising radiation in workers in France, the United
+Kingdom, and the United States (INWORKS): cohort study. BMJ 382: e074520
+(2023).
+
+Leuraud, K., D.B. Richardson, E. Cardis et al. Ionising radiation and
+risk of death from leukaemia and lymphoma in radiation-monitored workers
+(INWORKS): an international cohort study. Lancet Haematol 2(7): e276-281
+(2015).
