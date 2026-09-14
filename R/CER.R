@@ -262,6 +262,7 @@ Comp_Exrisk <- function( exposure, riskmodel, option, per=1 ){
   data.frame( age=ages, risk=b*per )
 }
 
+#'@export
 mc_CER <- function( exposure, reference, riskmodel, option ){
   ages <- reference$baseline$age
   nexp <- length(exposure$agex)
