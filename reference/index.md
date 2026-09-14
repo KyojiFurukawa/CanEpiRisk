@@ -8,7 +8,7 @@
   [`CanEpiRisk`](https://kyojifurukawa.github.io/CanEpiRisk/reference/CanEpiRisk.md)
   : CanEpiRisk
 - [`Comp_Exrisk()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/Comp_Exrisk.md)
-  : Calculating excess risks
+  : mc_CER: Calculating excess risks
 - [`Incidence`](https://kyojifurukawa.github.io/CanEpiRisk/reference/Incidence.md)
   : Cancer incidence rates of WHO global regions
 - [`LSS_incidence`](https://kyojifurukawa.github.io/CanEpiRisk/reference/LSS_incidence.md)
@@ -19,6 +19,8 @@
   : Cancer mortality rates of WHO global regions
 - [`YLL()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/YLL.md)
   : Calculate Years of Life Lost (YLL) due to Radiation Exposure
+- [`mc_CER()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/mc_CER.md)
+  : Generating s Monte Carlo sample of CER
 - [`plot_agedist()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/plot_agedist.md)
   : Plotting age distributions
 - [`plot_refdata()`](https://kyojifurukawa.github.io/CanEpiRisk/reference/plot_refdata.md)

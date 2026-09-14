@@ -1,4 +1,4 @@
-# Calculating excess risks
+# mc_CER: Calculating excess risks
 
 Calculate the excess risk from a risk model under a specified exposure
 scenario.
@@ -53,15 +53,5 @@ information of calculated excess risk (data.frame)
  # The following examples use default data provided in CanEpiRisk package
  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
-
- # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
- exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
- ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
-              mortality=Mortality[[1]]$allcause )       # all-cause mortality
- mod1 <- LSS_mortality$allsolid$L                       # risk model
- opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
- CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
-#>         mle        mean      median  ci_lo.2.5% ci_up.97.5% 
-#>    221.1383    226.9980    221.3491    147.4071    337.7613 
 
 ```
