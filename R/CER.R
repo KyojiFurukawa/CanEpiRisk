@@ -225,7 +225,7 @@ population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=10000
 }
 
 
-#'Calculating excess risks
+#' @title mc_CER: Calculating excess risks
 #'@description Calculate the excess risk from a risk model under a specified exposure scenario.
 #'
 #'@param exposure a list object that specifies the exposure scenario, which contains \code{agex} (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).
@@ -238,14 +238,6 @@ population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=10000
 #'  # The following examples use default data provided in CanEpiRisk package
 #'  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
 #'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
-#'
-#'  # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
-#'  exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
-#'  ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
-#'               mortality=Mortality[[1]]$allcause )       # all-cause mortality
-#'  mod1 <- LSS_mortality$allsolid$L                       # risk model
-#'  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
-#'  CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
 #'
 #'
 #'@seealso \link{LSS_mortality}, \link{LSS_incidence}
@@ -262,6 +254,67 @@ Comp_Exrisk <- function( exposure, riskmodel, option, per=1 ){
   data.frame( age=ages, risk=b*per )
 }
 
+#'Generating s Monte Carlo sample of CER
+#'@description Generatie s Monte Carlo sample of CER from a risk model under a specified exposure scenario.
+#'
+#' @param exposure list. Exposure scenario with components:
+#' \itemize{
+#'   \item \code{agex}: age(s) at exposure (scalar or vector).
+#'   \item \code{doseGy}: dose(s) in gray (Gy); same length as \code{agex} if vectorized.
+#'   \item \code{sex}: sex indicator (\code{1} = male, \code{2} = female).
+#' }
+#'
+#' @param reference list. Baseline reference data for the same population/region with:
+#' \itemize{
+#'   \item \code{baseline}: data frame of site-specific baseline rates (incidence or mortality),
+#'         with columns \code{age}, \code{male}, \code{female} on ages 1:100.
+#'   \item \code{mortality}: data frame of all-cause mortality (same columns/age grid).
+#' }
+#'
+#' @param riskmodel list. Radiation risk model definition with sublists for
+#' \emph{excess relative risk} (ERR) and \emph{excess absolute risk} (EAR), e.g.:
+#' \itemize{
+#'   \item \code{err}/\code{ear}: each a list containing
+#'     \code{para} (numeric parameter vector),
+#'     \code{var} (variance–covariance matrix) \emph{or} \code{ci} (confidence interval for
+#'     1-parameter models), and
+#'     \code{f} (function of the form \code{f(beta, data, lag)} returning age-specific excess risk).
+#' }
+#'
+#' @param option list. Optional settings:
+#' \itemize{
+#'   \item \code{maxage}: maximum attained age for accumulation (e.g., \code{100}).
+#'   \item \code{err_wgt}: weight to blend ERR vs EAR (\code{1} = pure ERR; \code{0} = pure EAR;
+#'         intermediate values allowed).
+#'   \item \code{n_mcsamp}: Monte Carlo sample size for uncertainty propagation (e.g., \code{10000}).
+#'   \item \code{alpha}: significance level for interval estimation (default \code{0.05}).
+#' }
+#'
+#' @return
+#' A named numeric vector with point and interval summaries of cumulative excess risk,
+#' typically including:
+#' \itemize{
+#'   \item \code{mle}: point estimate,
+#'   \item \code{mean}, \code{median}: Monte Carlo summaries,
+#'   \item \code{ci_lo}, \code{ci_up}: confidence intervals.
+#' }
+#' Values are per person; multiply by \code{1e4} or \code{1e5} to report per 10,000 or 100,000.
+#'@return information of calculated excess risk (data.frame)
+#'
+#'@examples
+#'  # The following examples use default data provided in CanEpiRisk package
+#'  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
+#'  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
+#'
+#'  # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
+#'  exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
+#'  ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
+#'               mortality=Mortality[[1]]$allcause )       # all-cause mortality
+#'  mod1 <- LSS_mortality$allsolid$L                       # risk model
+#'  opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
+#'  CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
+#'
+#'
 #'@export
 mc_CER <- function( exposure, reference, riskmodel, option ){
   ages <- reference$baseline$age

@@ -2,7 +2,7 @@
 % Please edit documentation in R/CER.R
 \name{Comp_Exrisk}
 \alias{Comp_Exrisk}
-\title{Calculating excess risks}
+\title{mc_CER: Calculating excess risks}
 \usage{
 Comp_Exrisk(exposure, riskmodel, option, per = 1)
 }
@@ -25,14 +25,6 @@ Calculate the excess risk from a risk model under a specified exposure scenario.
  # The following examples use default data provided in CanEpiRisk package
  # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
  # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
-
- # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
- exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
- ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
-              mortality=Mortality[[1]]$allcause )       # all-cause mortality
- mod1 <- LSS_mortality$allsolid$L                       # risk model
- opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
- CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
 
 
 }
