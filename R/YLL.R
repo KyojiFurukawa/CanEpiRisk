@@ -197,6 +197,7 @@ population_YLL <- function( dsGy, reference, riskmodel, agex=1:8*10-5, nmc=10000
 }
 
 
+#'@export
 mc_YLL <- function( exposure, reference, riskmodel, option )
 {
   # option=list( mc_para=NULL, maxage=100, err_wgt=1, n_mcsamp=10000)
