@@ -98,7 +98,7 @@ opt2 <- list(maxage = 60, err_wgt = 0, n_mcsamp = 10000)
 cer2 <- CER(exposure = exp2, reference = ref2, riskmodel = mod2, option = opt2)
 cer2 * 10000
 #>         mle        mean      median  ci_lo.2.5% ci_up.97.5% 
-#>  3.68374227  3.66876471  3.63603307  0.05966926  7.39791682
+#>   3.6837423   3.6450825   3.6131432   0.1187444   7.2777762
 ```
 
 ### 3.3 Years of Life Lost (YLL)

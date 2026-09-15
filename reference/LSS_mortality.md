@@ -99,8 +99,8 @@ plot_riskmodel()
 #>               exp(beta[1])*data$dose * exp(beta[2] * (data$agex - 30)/10 + beta[3] * log(data$age/70)) *
 #>            (1 + c(-1, 1)[data$sex] * beta[4]) * (data$age - data$agex >= lag )
 #>        }
-#> <bytecode: 0x5601f4fa32e8>
-#> <environment: 0x5601f4fa0328>
+#> <bytecode: 0x56059a38fb58>
+#> <environment: 0x56059a38cb98>
 #> 
  LSS_mortality$allsolid$L$ear     # Linear EAR model for all solid cancer motality
 #> $para
@@ -118,8 +118,8 @@ plot_riskmodel()
 #>          exp(beta[1])*data$dose * exp(beta[2] * (data$agex - 30)/10 + beta[3] * log(data$age/70)) *
 #>            (1 + c(-1, 1)[data$sex] * beta[4]) * (data$age - data$agex >= lag )
 #>        }
-#> <bytecode: 0x5601f4fa9550>
-#> <environment: 0x5601f4fa0328>
+#> <bytecode: 0x56059a395dc0>
+#> <environment: 0x56059a38cb98>
 #> 
 
  LSS_mortality$leukaemia$LQ$err   # Linear-quadratic ERR model for leukaemia motality
@@ -156,8 +156,8 @@ plot_riskmodel()
 #>               exp(beta[1])*data$dose * exp(beta[2] * (data$agex - 30)/10 + beta[3] * log(data$age/70)) *
 #>            (1 + c(-1, 1)[data$sex] * beta[4]) * (data$age - data$agex >= lag )
 #>        }
-#> <bytecode: 0x5601f4fdc0f8>
-#> <environment: 0x5601f4fd9058>
+#> <bytecode: 0x56059a3c8968>
+#> <environment: 0x56059a3c58c8>
 #> 
 
  # Plotting LSS all solid cancer mortality risk model

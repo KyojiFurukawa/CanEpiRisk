@@ -135,5 +135,5 @@ opt2 <- list(maxage = 60, err_wgt = 0, n_mcsamp = 10000)
 
 YLL(exposure = exp2, reference = ref2, riskmodel = mod2, option = opt2)
 #>           mle          mean        median    ci_lo.2.5%   ci_up.97.5% 
-#>  4.118829e-03  4.046922e-03  4.046761e-03 -6.836959e-05  8.171657e-03 
+#>  4.118829e-03  4.102726e-03  4.086742e-03 -3.797545e-05  8.190728e-03 
 ```
