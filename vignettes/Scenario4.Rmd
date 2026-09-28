@@ -1,0 +1,199 @@
+---
+title: "Occupational Scenario: Radiation Risk Calculation Using CanEpiRisk"
+author: "Furukawa"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    theme: readable
+---
+
+# Introduction
+
+This document reproduces **Scenario 4 (Occupational Scenario)** from the UNSCEAR CanEpi Report using the **CanEpiRisk** R package.
+
+Scenario assumptions:
+
+- Population: Male worker  
+- Exposure period: Ages 20–45  
+- Total dose: 100 mGy (0.1 Gy)  
+- Outcome: Solid cancer mortality  
+- Risk models: LSS and INWORKS  
+- Risk metric: CER  
+- Risk accumulated to: Age 60  
+
+---
+
+# Install and load CanEpiRisk
+
+```{r}
+# Install CanEpiRisk from GitHub if not installed
+if (!require("CanEpiRisk")) {
+  install.packages("devtools")
+  devtools::install_github("KyojiFurukawa/CanEpiRisk")
+}
+
+library(CanEpiRisk)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+```
+
+---
+
+# Define Scenario 4 exposure
+
+```{r}
+exp4 <- list(
+  agex   = 30:44 + 0.5,
+  doseGy = rep(0.1/15, 15),
+  sex    = 1
+)
+exp4
+```
+
+---
+
+# Exposure profile plot
+
+```{r}
+df_exp <- data.frame(
+  age  = exp4$agex,
+  dose = exp4$doseGy
+)
+
+ggplot(df_exp, aes(x = age, y = dose)) +
+  geom_col(fill = "steelblue") +
+  labs(title = "Exposure Profile (Scenario 4)",
+       x = "Age at Exposure",
+       y = "Dose per Year (Gy)") +
+  theme_minimal()
+```
+
+---
+
+# Reference data (Region 1)
+
+```{r}
+ref4_1 <- list(
+  baseline = Mortality[[1]]$allsolid,
+  mortality = Mortality[[1]]$allcause
+)
+ref4_1
+```
+
+---
+
+# Risk models
+
+```{r}
+rm_LSS_L  <- LSS_mortality$allsolid$L
+rm_LSS_LQ <- LSS_mortality$allsolid$LQ
+rm_INW_L  <- INWORKS_mortality$allsolid$L
+
+rm_LSS_L
+```
+
+---
+
+# Calculation options
+
+```{r}
+opt4_err <- list(maxage = 60, err_wgt = 1, n_mcsamp = 10000)
+opt4_ear <- list(maxage = 60, err_wgt = 0, n_mcsamp = 10000)
+
+opt4_err
+```
+
+---
+
+# CER calculations (per 10,000)
+
+```{r}
+cer_LSS_L_err  <- CER(exp4, ref4_1, rm_LSS_L,  opt4_err) * 10000
+cer_LSS_L_ear  <- CER(exp4, ref4_1, rm_LSS_L,  opt4_ear) * 10000
+cer_LSS_LQ_err <- CER(exp4, ref4_1, rm_LSS_LQ, opt4_err) * 10000
+cer_LSS_LQ_ear <- CER(exp4, ref4_1, rm_LSS_LQ, opt4_ear) * 10000
+cer_INW_err    <- CER(exp4, ref4_1, rm_INW_L,  opt4_err) * 10000
+cer_INW_ear    <- CER(exp4, ref4_1, rm_INW_L,  opt4_ear) * 10000
+
+cer_LSS_L_err
+```
+
+---
+
+# CER summary table
+
+```{r}
+cer_results <- data.frame(
+  Model = c("LSS Linear ERR", "LSS Linear EAR",
+            "LSS LQ ERR", "LSS LQ EAR",
+            "INWORKS ERR", "INWORKS EAR"),
+  CER_mean = c(cer_LSS_L_err$mean,
+               cer_LSS_L_ear$mean,
+               cer_LSS_LQ_err$mean,
+               cer_LSS_LQ_ear$mean,
+               cer_INW_err$mean,
+               cer_INW_ear$mean)
+)
+
+kable(cer_results, caption = "CER Results for Scenario 4 (per 10,000)")
+```
+
+---
+
+# CER curves as a function of age
+
+```{r}
+ages <- 30:60
+
+calc_curve <- function(model, opt) {
+  sapply(ages, function(a) {
+    exp_tmp <- exp4
+    exp_tmp$agex <- a
+    CER(exp_tmp, ref4_1, model, opt)$mean * 10000
+  })
+}
+
+df_curve <- data.frame(
+  age        = ages,
+  LSS_L_ERR  = calc_curve(rm_LSS_L,  opt4_err),
+  LSS_L_EAR  = calc_curve(rm_LSS_L,  opt4_ear),
+  LSS_LQ_ERR = calc_curve(rm_LSS_LQ, opt4_err),
+  LSS_LQ_EAR = calc_curve(rm_LSS_LQ, opt4_ear),
+  INW_ERR    = calc_curve(rm_INW_L,  opt4_err),
+  INW_EAR    = calc_curve(rm_INW_L,  opt4_ear)
+)
+
+df_long <- pivot_longer(df_curve, -age,
+                        names_to = "Model",
+                        values_to = "CER")
+
+ggplot(df_long, aes(x = age, y = CER, color = Model)) +
+  geom_line(size = 1.1) +
+  labs(title = "CER Curves for Scenario 4",
+       x = "Age",
+       y = "CER per 10,000") +
+  theme_minimal()
+```
+
+---
+
+# Interpretation
+
+- LSS Linear ERR model: ~6–7 per 10,000  
+- INWORKS ERR model: ~10 per 10,000  
+- LSS LQ models: lower CER due to curvature  
+- EAR models: generally higher CER  
+
+These values represent the **excess lifetime risk attributable to 100 mGy occupational exposure**, accumulated to age 60.
+
+---
+
+# Summary
+
+- CanEpiRisk provides unified ERR/EAR risk calculations  
+- Scenario 4 represents realistic chronic occupational exposure  
+- CER tables and curves help compare risk across models  
+

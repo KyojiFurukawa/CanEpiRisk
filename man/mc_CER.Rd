@@ -2,71 +2,99 @@
 % Please edit documentation in R/CER.R
 \name{mc_CER}
 \alias{mc_CER}
-\title{Generating s Monte Carlo sample of CER}
+\title{mc_CER: Monte Carlo samples of cumulative excess risk}
 \usage{
 mc_CER(exposure, reference, riskmodel, option)
 }
 \arguments{
-\item{exposure}{list. Exposure scenario with components:
+\item{exposure}{List defining the exposure scenario:
 \itemize{
 \item \code{agex}: age(s) at exposure (scalar or vector).
-\item \code{doseGy}: dose(s) in gray (Gy); same length as \code{agex} if vectorized.
-\item \code{sex}: sex indicator (\code{1} = male, \code{2} = female).
+\item \code{doseGy}: dose(s) in gray (Gy), with the same length as \code{agex}.
+\item \code{sex}: \code{1} for male or \code{2} for female.
 }}
 
-\item{reference}{list. Baseline reference data for the same population/region with:
+\item{reference}{List of rates for the same population or region:
 \itemize{
-\item \code{baseline}: data frame of site-specific baseline rates (incidence or mortality),
-with columns \code{age}, \code{male}, \code{female} on ages 1:100.
-\item \code{mortality}: data frame of all-cause mortality (same columns/age grid).
+\item \code{baseline}: site-specific incidence or mortality rates, with
+columns \code{age}, \code{male}, and \code{female}.
+\item \code{mortality}: all-cause mortality rates on the same age grid,
+with columns \code{age}, \code{male}, and \code{female}.
 }}
 
-\item{riskmodel}{list. Radiation risk model definition with sublists for
-\emph{excess relative risk} (ERR) and \emph{excess absolute risk} (EAR), e.g.:
-\itemize{
-\item \code{err}/\code{ear}: each a list containing
-\code{para} (numeric parameter vector),
-\code{var} (variance–covariance matrix) \emph{or} \code{ci} (confidence interval for
-1-parameter models), and
-\code{f} (function of the form \code{f(beta, data, lag)} returning age-specific excess risk).
-}}
+\item{riskmodel}{List with \code{err} and \code{ear} components for excess
+relative and excess absolute risk. Each applicable component contains
+\code{para} (parameter estimates), \code{f} (a function of the parameter vector
+and exposure data), and, when parameter draws must be generated, \code{var}
+(the parameter variance-covariance matrix). The model functions receive
+\code{data} with dose, age at exposure, attained age, and sex.}
 
-\item{option}{list. Optional settings:
+\item{option}{List of calculation settings:
 \itemize{
-\item \code{maxage}: maximum attained age for accumulation (e.g., \code{100}).
-\item \code{err_wgt}: weight to blend ERR vs EAR (\code{1} = pure ERR; \code{0} = pure EAR;
-intermediate values allowed).
-\item \code{n_mcsamp}: Monte Carlo sample size for uncertainty propagation (e.g., \code{10000}).
-\item \code{alpha}: significance level for interval estimation (default \code{0.05}).
+\item \code{maxage}: maximum attained age included in the calculation.
+\item \code{err_wgt}: weight on the ERR result; \code{1} selects ERR,
+\code{0} selects EAR, and values between 0 and 1 blend the two.
+\item \code{mle_only}: if \code{TRUE}, use \code{para} without sampling
+and return a single CER value.
+\item \code{n_mcsamp}: number of parameter draws when \code{mle_only} is not
+\code{TRUE}. The number of rows in \code{mc_para$err}, if supplied,
+takes precedence.
+\item \code{mc_para}: optional list of precomputed parameter-draw matrices
+named \code{err} and/or \code{ear}; rows are draws and columns follow
+the corresponding \code{para} vector. Provide draws for each model
+with a nonzero weight, or supply its \code{var} for generation.
 }}
 }
 \value{
-A named numeric vector with point and interval summaries of cumulative excess risk,
-typically including:
-\itemize{
-\item \code{mle}: point estimate,
-\item \code{mean}, \code{median}: Monte Carlo summaries,
-\item \code{ci_lo}, \code{ci_up}: confidence intervals.
-}
-Values are per person; multiply by \code{1e4} or \code{1e5} to report per 10,000 or 100,000.
-
-information of calculated excess risk (data.frame)
+A single numeric CER when \code{option$mle_only} is \code{TRUE}; otherwise an
+unnamed numeric vector of CER values, one per Monte Carlo draw. Values are
+per person; multiply by \code{10000} to express them per 10,000 persons.
+Use \code{CER()} for the point estimate and interval summaries.
 }
 \description{
-Generatie s Monte Carlo sample of CER from a risk model under a specified exposure scenario.
+Calculate cumulative excess risk (CER) for a specified radiation exposure
+scenario. Return either one calculation at the supplied parameter estimates
+or a Monte Carlo sample that propagates uncertainty in the risk-model parameters.
+Unlike \code{CER()}, this function does not calculate summary statistics or
+confidence limits from the sample.
 }
+\details{
+Monte Carlo samples of cumulative excess risk
+
+The function sums age-specific excess risks from each exposure segment through
+\code{maxage}. ERR-based excess rates use the site-specific baseline rates;
+EAR-based excess rates are absolute rates. Both are weighted by survival from
+all-cause mortality, conditional on survival to the first age at exposure.
+For Monte Carlo calculations, parameter draws are taken from \code{option$mc_para}
+when supplied; otherwise they are generated from the applicable model's
+\code{para} and \code{var} using a multivariate normal distribution. This
+function does not use \code{ci} bounds to generate parameter draws.
+}
+\section{Units & Alignment}{
+
+Doses must be in Gy. The baseline and all-cause mortality tables must refer
+to the same population and have aligned age rows and sex columns.
+}
+
 \examples{
- # The following examples use default data provided in CanEpiRisk package
- # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
- # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
+set.seed(100)
+exposure <- list(agex = 15, doseGy = 0.1, sex = 2)
+reference <- list(
+  baseline  = Mortality[[1]]$allsolid,
+  mortality = Mortality[[1]]$allcause
+)
+riskmodel <- LSS_mortality$allsolid$L
 
- # Example 1: allsolid mortality, Region-1, female, 0.1Gy at age 15, followed up to age 100, LSS linear ERR
- exp1 <- list( agex=5, doseGy=0.1, sex=2 )   # exposure scenario
- ref1 <- list( baseline=Mortality[[1]]$allsolid,        # baseline rates
-              mortality=Mortality[[1]]$allcause )       # all-cause mortality
- mod1 <- LSS_mortality$allsolid$L                       # risk model
- opt1 <- list( maxage=100, err_wgt=1, n_mcsamp=10000 )  # option
- CER(  exposure=exp1, reference=ref1, riskmodel=mod1, option=opt1 ) * 10000 # cases per 10,000
+# Point estimate per 10,000 persons
+mc_CER(exposure, reference, riskmodel,
+       option = list(maxage = 100, err_wgt = 1, mle_only = TRUE)) * 10000
 
+# Monte Carlo distribution and its 95\% percentile interval
+draws <- mc_CER(exposure, reference, riskmodel,
+                option = list(maxage = 100, err_wgt = 1, n_mcsamp = 1000))
+quantile(draws * 10000, c(0.025, 0.5, 0.975))
 
+}
+\seealso{
+\code{\link{CER}}, \code{\link{LSS_mortality}}
 }

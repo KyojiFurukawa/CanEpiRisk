@@ -2,32 +2,71 @@
 % Please edit documentation in R/CER.R
 \name{Comp_Exrisk}
 \alias{Comp_Exrisk}
-\title{mc_CER: Calculating excess risks}
+\title{Comp_Exrisk: Age-specific excess risk}
 \usage{
 Comp_Exrisk(exposure, riskmodel, option, per = 1)
 }
 \arguments{
-\item{exposure}{a list object that specifies the exposure scenario, which contains \code{agex} (a single value or a vector for age(s) at exposure), 'doseGy' (a single value or a vector of dose(s) in Gy), and 'sex' (1 or 2 for male or female).}
+\item{exposure}{List defining the exposure scenario:
+\itemize{
+\item \code{agex}: age(s) at exposure (scalar or vector). Put the first
+exposure age first, as it determines the start of the output grid.
+\item \code{doseGy}: dose(s) in gray (Gy), with the same length as \code{agex}.
+\item \code{sex}: \code{1} for male or \code{2} for female.
+}}
 
-\item{riskmodel}{a list object that specifies the risk model, which contains two list objects named \code{err} for excess relative rate model and 'ear' for excess absolute rate model, each of which contains a vector 'para' for model parameter estimates and a function 'f' to compute the excess risk given a parameter vector and exposure information (e.g., dose, age at exposure, sex, attained age).}
+\item{riskmodel}{List containing \code{err} and/or \code{ear}, according to
+the model selected by \code{option$err_wgt}. The selected component must
+contain \code{para} (parameter estimates) and \code{f} (a function of the
+parameter vector and exposure data). The function receives \code{data}
+with dose, age at exposure, attained age, and sex. Parameter uncertainty
+information such as \code{var} or \code{ci} is not used.}
 
-\item{option}{a list object that specifies optional settings for risk calculation, which contains an integer value 'maxage' for the maximum age to follow up and a value 'err_wgt' for the weight for risk transfer (1=err, 0=ear).}
+\item{option}{List with \code{maxage}, the last age in the output grid, and
+\code{err_wgt}, where \code{0} selects EAR and any other value selects ERR.
+This function does not calculate a weighted mixture of the models.}
 
-\item{per}{an integer value for the risk denominator (default=1).}
+\item{per}{Numeric multiplier applied to the calculated risk at each age
+(default \code{1}). For example, \code{per = 10000} expresses an EAR per
+10,000 person-years when the model's EAR is per person-year. An ERR is
+dimensionless before scaling.}
 }
 \value{
-information of calculated excess risk (data.frame)
+A data frame with \code{age} (integer attained-age labels) and \code{risk}
+(the sum of excess-risk contributions at that age, multiplied by \code{per}).
+The values are age-specific; they are not cumulative excess risks.
 }
 \description{
-Calculate the excess risk from a risk model under a specified exposure scenario.
+Calculate the age-specific excess relative risk (ERR) or excess absolute
+rate (EAR) implied by a radiation risk model and exposure scenario.
+}
+\details{
+Age-specific excess risk under an exposure scenario
+
+The function evaluates the selected model at attained ages from
+\code{ceiling(exposure$agex[1])} through \code{option$maxage}, using each
+integer age minus 0.5 as the attained age passed to the model function.
+Contributions from multiple exposure ages are summed at each attained age.
+Unlike \code{CER()}, this function does not use baseline or all-cause
+mortality rates, weight by survival, or accumulate risk over attained age.
+It uses the EAR model only when \code{option$err_wgt == 0}; any other value
+selects the ERR model. Intermediate values do not blend ERR and EAR here.
 }
 \examples{
- # The following examples use default data provided in CanEpiRisk package
- # for riskmodels (LSS_mortality and LSS_incidence) derived from Life Span Study
- # and baseline mortality and incidence rates for WHO global regions (Mortality and Incidence).
+# 100 mGy distributed evenly across 15 exposure ages in a male worker
+exposure <- list(agex = 30:44 + 0.5, doseGy = rep(0.1/15, 15), sex = 1)
+riskmodel <- LSS_mortality$allsolid$L
 
+err_by_age <- Comp_Exrisk(exposure, riskmodel,
+                          option = list(maxage = 90, err_wgt = 1))
+plot(err_by_age$age, err_by_age$risk, type = "l",
+     xlab = "Attained age (years)", ylab = "Excess relative risk")
+
+ear_by_age <- Comp_Exrisk(exposure, riskmodel,
+                          option = list(maxage = 90, err_wgt = 0), per = 10000)
+head(ear_by_age)  # excess absolute rate per 10,000 person-years
 
 }
 \seealso{
-\link{LSS_mortality}, \link{LSS_incidence}
+\code{\link{CER}}, \code{\link{mc_CER}}, \code{\link{LSS_mortality}}
 }
