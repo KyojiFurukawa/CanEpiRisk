@@ -114,10 +114,6 @@ CER <- function( exposure, reference, riskmodel, option )
   res
 }
 
-
-
-
-
 #' Monte Carlo samples of cumulative excess risk
 #'
 #' @title mc_CER: Monte Carlo samples of cumulative excess risk
