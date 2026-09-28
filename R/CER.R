@@ -114,191 +114,9 @@ CER <- function( exposure, reference, riskmodel, option )
   res
 }
 
-#' @title population_LAR: Population-averaged Lifetime Attributable Risk
-#'
-#' @description
-#' Compute **population-averaged lifetime attributable risk (LAR)** due to radiation
-#' exposure, aggregating over a population age distribution and sex-specific baseline
-#' rates. The function combines user-specified excess risk models (ERR/EAR) with
-#' site-specific baseline incidence/mortality and all-cause mortality to produce
-#' age-category summaries and overall totals, with uncertainty from Monte Carlo
-#' sampling.
-#'
-#' @details
-#' Let \code{agedist} denote the population age distribution (by single-year or grouped
-#' ages) and \code{baseline}/\code{mortality} denote site-specific baseline rates and
-#' all-cause mortality for the same region/population and sex coding. For each
-#' age-at-exposure category in \code{agex}, \code{population_LAR()} evaluates LAR under
-#' the supplied risk model(s) and then averages across the age structure, returning
-#' sex-specific estimates and an \code{all}-sex average. Uncertainty is obtained by
-#' drawing model parameters either from a variance–covariance matrix (\code{var}) or,
-#' in one-parameter models, from 95% confidence bounds (\code{ci}) when provided.
-#'
-#' Results are reported **per \code{PER} persons** (default: per 10,000). The default
-#' \code{agex = 1:8 * 10 - 5} corresponds to midpoint ages 5, 15, …, 75, i.e.,
-#' exposure categories 0–10, 10–20, …, 70–80 years, which should match the categories of \code{agedist}.
-#'
-#' @param dsGy Numeric scalar. Radiation **dose** in Gy (or Sv if your model is parameterized
-#'   accordingly). Must be nonnegative.
-#'
-#' @param reference List describing the target **reference population**, with components:
-#'   \itemize{
-#'     \item \code{baseline} — data frame of site-specific baseline **incidence or mortality**
-#'       rates (per person-year) over ages 1–100, with columns \code{age}, \code{male}, \code{female}.
-#'     \item \code{mortality} — data frame of **all-cause mortality** (same structure/age grid).
-#'     \item \code{agedist} — data frame or vector with the **population age distribution** used
-#'       to average risks across ages (e.g., by single year or grouped ages).
-#'   }
-#'   All three components must refer to the **same region/population** and share consistent
-#'   sex coding.
-#'
-#' @param riskmodel List defining the radiation **risk model**. Typically contains
-#'   sublists for ERR and/or EAR:
-#'   \itemize{
-#'     \item \code{err} / \code{ear} — each is a list with:
-#'       \itemize{
-#'         \item \code{para} — numeric vector of model parameters;
-#'         \item \code{var} — parameter variance–covariance matrix (for multi-parameter models), \emph{or}
-#'               \code{ci} — confidence bounds for one-parameter models;
-#'         \item \code{f} — function of the form \code{f(beta, data, lag)} returning age-specific
-#'               excess risk given parameters and data (dose, ages, sex).
-#'       }
-#'   }
-#'   See package examples (e.g., \code{LSS_mortality$allsolid$L}, \code{LSS_incidence$leukaemia$LQ}).
-#'
-#' @param agex Numeric vector of **ages at exposure** (midpoints for grouped categories).
-#'   Default is \code{1:8 * 10 - 5} (i.e., 5, 15, …, 75) representing 0–10, 10–20, …, 70–80.
-#'
-#' @param PER Integer scaling factor for reporting results \emph{per} \code{PER} persons.
-#'   Default \code{10000} (i.e., cases per 10,000 persons).
-#'
-#' @param nmc Integer Monte Carlo sample size for uncertainty propagation. Default \code{10000}.
-#'
-#' @return
-#' A **list** with components for each transfer model present (typically \code{$err} and \code{$ear}).
-#' Each component is a data frame with one row per exposure age category (rows named by
-#' \code{agex}) plus an \code{all} row, and columns:
-#' \itemize{
-#'   \item \code{male}, \code{male_lo}, \code{male_up}
-#'   \item \code{female}, \code{female_lo}, \code{female_up}
-#'   \item \code{all}, \code{all_lo}, \code{all_up}
-#' }
-#' Values are LAR **per \code{PER} persons**.
-#'
-#' @section Units & Alignment:
-#' Doses must be in Gy (or consistent with your model). Ensure \code{baseline} and
-#' \code{mortality} share the same age grid (typically 1–100) and sex coding, and that
-#' \code{agedist} corresponds to the same population.
-#'
-#'
-#' @examples
-#' set.seed(100)
-#' # Default package data: LSS-derived models and WHO-like regional rates
-#' # Example 1: All solid cancer mortality, Region 1, dose = 0.1 Gy
-#' ref1 <- list(
-#'   baseline  = Mortality[[1]]$allsolid,   # site-specific baseline mortality
-#'   mortality = Mortality[[1]]$allcause,   # all-cause mortality
-#'   agedist   = agedist_rgn[[1]]           # population age distribution
-#' )
-#' mod1 <- LSS_mortality$allsolid$L         # linear ERR model (LSS)
-#' out1 <- population_LAR(dsGy = 0.1, reference = ref1, riskmodel = mod1)
-#' out1$err   # per 10,000 persons by default
-#'
-#' # Example 2: Leukaemia incidence, Region 4, dose = 0.1 Gy, LQ model
-#' ref2 <- list(
-#'   baseline  = Incidence[[4]]$leukaemia,
-#'   mortality = Mortality[[4]]$allcause,
-#'   agedist   = agedist_rgn[[4]]
-#' )
-#' mod2 <- LSS_incidence$leukaemia$LQ
-#' out2 <- population_LAR(dsGy = 0.1, reference = ref2, riskmodel = mod2, PER = 10000, nmc = 10000)
-#' out2$err
-#'
-#' @seealso
-#' \code{\link{CER}}, \code{\link{plot_agedist}}, \code{\link{population_YLL}}, \code{\link{YLL}}
-#'@importFrom MASS mvrnorm
-#'@export
-population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=10000, nmc=10000 ){
-  lars0 <- mc_popLAR( dsGy, riskmodel, reference, agexs=agex, n_mcsamp=nmc )
-  list( err=popLAR( lars0=lars0, wgt=c(1,0), agedist=reference$agedist, PER=PER, agex=agex ) ,
-        ear=popLAR( lars0=lars0, wgt=c(0,1), agedist=reference$agedist, PER=PER, agex=agex ) )
-}
 
 
-#' Age-specific excess risk under an exposure scenario
-#'
-#' @title Comp_Exrisk: Age-specific excess risk
-#'
-#' @description
-#' Calculate the age-specific excess relative risk (ERR) or excess absolute
-#' rate (EAR) implied by a radiation risk model and exposure scenario.
-#'
-#' @details
-#' The function evaluates the selected model at attained ages from
-#' \code{ceiling(exposure$agex[1])} through \code{option$maxage}, using each
-#' integer age minus 0.5 as the attained age passed to the model function.
-#' Contributions from multiple exposure ages are summed at each attained age.
-#' Unlike \code{CER()}, this function does not use baseline or all-cause
-#' mortality rates, weight by survival, or accumulate risk over attained age.
-#' It uses the EAR model only when \code{option$err_wgt == 0}; any other value
-#' selects the ERR model. Intermediate values do not blend ERR and EAR here.
-#'
-#' @param exposure List defining the exposure scenario:
-#' \itemize{
-#'   \item \code{agex}: age(s) at exposure (scalar or vector). Put the first
-#'         exposure age first, as it determines the start of the output grid.
-#'   \item \code{doseGy}: dose(s) in gray (Gy), with the same length as \code{agex}.
-#'   \item \code{sex}: \code{1} for male or \code{2} for female.
-#' }
-#'
-#' @param riskmodel List containing \code{err} and/or \code{ear}, according to
-#' the model selected by \code{option$err_wgt}. The selected component must
-#' contain \code{para} (parameter estimates) and \code{f} (a function of the
-#' parameter vector and exposure data). The function receives \code{data}
-#' with dose, age at exposure, attained age, and sex. Parameter uncertainty
-#' information such as \code{var} or \code{ci} is not used.
-#'
-#' @param option List with \code{maxage}, the last age in the output grid, and
-#' \code{err_wgt}, where \code{0} selects EAR and any other value selects ERR.
-#' This function does not calculate a weighted mixture of the models.
-#'
-#' @param per Numeric multiplier applied to the calculated risk at each age
-#' (default \code{1}). For example, \code{per = 10000} expresses an EAR per
-#' 10,000 person-years when the model's EAR is per person-year. An ERR is
-#' dimensionless before scaling.
-#'
-#' @return
-#' A data frame with \code{age} (integer attained-age labels) and \code{risk}
-#' (the sum of excess-risk contributions at that age, multiplied by \code{per}).
-#' The values are age-specific; they are not cumulative excess risks.
-#'
-#' @examples
-#' # 100 mGy distributed evenly across 15 exposure ages in a male worker
-#' exposure <- list(agex = 30:44 + 0.5, doseGy = rep(0.1/15, 15), sex = 1)
-#' riskmodel <- LSS_mortality$allsolid$L
-#'
-#' err_by_age <- Comp_Exrisk(exposure, riskmodel,
-#'                           option = list(maxage = 90, err_wgt = 1))
-#' plot(err_by_age$age, err_by_age$risk, type = "l",
-#'      xlab = "Attained age (years)", ylab = "Excess relative risk")
-#'
-#' ear_by_age <- Comp_Exrisk(exposure, riskmodel,
-#'                           option = list(maxage = 90, err_wgt = 0), per = 10000)
-#' head(ear_by_age)  # excess absolute rate per 10,000 person-years
-#'
-#' @seealso \code{\link{CER}}, \code{\link{mc_CER}}, \code{\link{LSS_mortality}}
-#' @export
-Comp_Exrisk <- function( exposure, riskmodel, option, per=1 ){
-  ages <- ceiling(exposure$agex[1]):option$maxage
-  nexp <- length(exposure$agex)
-  rm <- riskmodel$err
-  if( option$err_wgt==0 ) rm <- riskmodel$ear
-  a <- sapply(1:nexp, function(i)
-    rm$f( rm$para, data.frame(dose=exposure$doseGy[i], agex=exposure$agex[i],
-                              age=ages-0.5, sex=exposure$sex) ) )
-  b <- apply( a, 1, sum )
-  data.frame( age=ages, risk=b*per )
-}
+
 
 #' Monte Carlo samples of cumulative excess risk
 #'
@@ -445,6 +263,115 @@ mc_CER <- function( exposure, reference, riskmodel, option ){
   res_total
 }
 
+#' @title population_LAR: Population-averaged Lifetime Attributable Risk
+#'
+#' @description
+#' Compute **population-averaged lifetime attributable risk (LAR)** due to radiation
+#' exposure, aggregating over a population age distribution and sex-specific baseline
+#' rates. The function combines user-specified excess risk models (ERR/EAR) with
+#' site-specific baseline incidence/mortality and all-cause mortality to produce
+#' age-category summaries and overall totals, with uncertainty from Monte Carlo
+#' sampling.
+#'
+#' @details
+#' Let \code{agedist} denote the population age distribution (by single-year or grouped
+#' ages) and \code{baseline}/\code{mortality} denote site-specific baseline rates and
+#' all-cause mortality for the same region/population and sex coding. For each
+#' age-at-exposure category in \code{agex}, \code{population_LAR()} evaluates LAR under
+#' the supplied risk model(s) and then averages across the age structure, returning
+#' sex-specific estimates and an \code{all}-sex average. Uncertainty is obtained by
+#' drawing model parameters either from a variance–covariance matrix (\code{var}) or,
+#' in one-parameter models, from 95% confidence bounds (\code{ci}) when provided.
+#'
+#' Results are reported **per \code{PER} persons** (default: per 10,000). The default
+#' \code{agex = 1:8 * 10 - 5} corresponds to midpoint ages 5, 15, …, 75, i.e.,
+#' exposure categories 0–10, 10–20, …, 70–80 years, which should match the categories of \code{agedist}.
+#'
+#' @param dsGy Numeric scalar. Radiation **dose** in Gy (or Sv if your model is parameterized
+#'   accordingly). Must be nonnegative.
+#'
+#' @param reference List describing the target **reference population**, with components:
+#'   \itemize{
+#'     \item \code{baseline} — data frame of site-specific baseline **incidence or mortality**
+#'       rates (per person-year) over ages 1–100, with columns \code{age}, \code{male}, \code{female}.
+#'     \item \code{mortality} — data frame of **all-cause mortality** (same structure/age grid).
+#'     \item \code{agedist} — data frame or vector with the **population age distribution** used
+#'       to average risks across ages (e.g., by single year or grouped ages).
+#'   }
+#'   All three components must refer to the **same region/population** and share consistent
+#'   sex coding.
+#'
+#' @param riskmodel List defining the radiation **risk model**. Typically contains
+#'   sublists for ERR and/or EAR:
+#'   \itemize{
+#'     \item \code{err} / \code{ear} — each is a list with:
+#'       \itemize{
+#'         \item \code{para} — numeric vector of model parameters;
+#'         \item \code{var} — parameter variance–covariance matrix (for multi-parameter models), \emph{or}
+#'               \code{ci} — confidence bounds for one-parameter models;
+#'         \item \code{f} — function of the form \code{f(beta, data, lag)} returning age-specific
+#'               excess risk given parameters and data (dose, ages, sex).
+#'       }
+#'   }
+#'   See package examples (e.g., \code{LSS_mortality$allsolid$L}, \code{LSS_incidence$leukaemia$LQ}).
+#'
+#' @param agex Numeric vector of **ages at exposure** (midpoints for grouped categories).
+#'   Default is \code{1:8 * 10 - 5} (i.e., 5, 15, …, 75) representing 0–10, 10–20, …, 70–80.
+#'
+#' @param PER Integer scaling factor for reporting results \emph{per} \code{PER} persons.
+#'   Default \code{10000} (i.e., cases per 10,000 persons).
+#'
+#' @param nmc Integer Monte Carlo sample size for uncertainty propagation. Default \code{10000}.
+#'
+#' @return
+#' A **list** with components for each transfer model present (typically \code{$err} and \code{$ear}).
+#' Each component is a data frame with one row per exposure age category (rows named by
+#' \code{agex}) plus an \code{all} row, and columns:
+#' \itemize{
+#'   \item \code{male}, \code{male_lo}, \code{male_up}
+#'   \item \code{female}, \code{female_lo}, \code{female_up}
+#'   \item \code{all}, \code{all_lo}, \code{all_up}
+#' }
+#' Values are LAR **per \code{PER} persons**.
+#'
+#' @section Units & Alignment:
+#' Doses must be in Gy (or consistent with your model). Ensure \code{baseline} and
+#' \code{mortality} share the same age grid (typically 1–100) and sex coding, and that
+#' \code{agedist} corresponds to the same population.
+#'
+#'
+#' @examples
+#' set.seed(100)
+#' # Default package data: LSS-derived models and WHO-like regional rates
+#' # Example 1: All solid cancer mortality, Region 1, dose = 0.1 Gy
+#' ref1 <- list(
+#'   baseline  = Mortality[[1]]$allsolid,   # site-specific baseline mortality
+#'   mortality = Mortality[[1]]$allcause,   # all-cause mortality
+#'   agedist   = agedist_rgn[[1]]           # population age distribution
+#' )
+#' mod1 <- LSS_mortality$allsolid$L         # linear ERR model (LSS)
+#' out1 <- population_LAR(dsGy = 0.1, reference = ref1, riskmodel = mod1)
+#' out1$err   # per 10,000 persons by default
+#'
+#' # Example 2: Leukaemia incidence, Region 4, dose = 0.1 Gy, LQ model
+#' ref2 <- list(
+#'   baseline  = Incidence[[4]]$leukaemia,
+#'   mortality = Mortality[[4]]$allcause,
+#'   agedist   = agedist_rgn[[4]]
+#' )
+#' mod2 <- LSS_incidence$leukaemia$LQ
+#' out2 <- population_LAR(dsGy = 0.1, reference = ref2, riskmodel = mod2, PER = 10000, nmc = 10000)
+#' out2$err
+#'
+#' @seealso
+#' \code{\link{CER}}, \code{\link{plot_agedist}}, \code{\link{population_YLL}}, \code{\link{YLL}}
+#'@importFrom MASS mvrnorm
+#'@export
+population_LAR <- function( dsGy, reference, riskmodel, agex=1:8*10-5, PER=10000, nmc=10000 ){
+  lars0 <- mc_popLAR( dsGy, riskmodel, reference, agexs=agex, n_mcsamp=nmc )
+  list( err=popLAR( lars0=lars0, wgt=c(1,0), agedist=reference$agedist, PER=PER, agex=agex ) ,
+        ear=popLAR( lars0=lars0, wgt=c(0,1), agedist=reference$agedist, PER=PER, agex=agex ) )
+}
 
 
 mc_popLAR <- function( ds, riskmodel, reference, agexs, n_mcsamp=0 ){
@@ -492,7 +419,80 @@ popLAR <- function( lars0, wgt, agedist, PER, agex ){     #    lars0 <- lars_inc
   ret
 }
 
-
+#' Age-specific excess risk under an exposure scenario
+#'
+#' @title Comp_Exrisk: Age-specific excess risk
+#'
+#' @description
+#' Calculate the age-specific excess relative risk (ERR) or excess absolute
+#' rate (EAR) implied by a radiation risk model and exposure scenario.
+#'
+#' @details
+#' The function evaluates the selected model at attained ages from
+#' \code{ceiling(exposure$agex[1])} through \code{option$maxage}, using each
+#' integer age minus 0.5 as the attained age passed to the model function.
+#' Contributions from multiple exposure ages are summed at each attained age.
+#' Unlike \code{CER()}, this function does not use baseline or all-cause
+#' mortality rates, weight by survival, or accumulate risk over attained age.
+#' It uses the EAR model only when \code{option$err_wgt == 0}; any other value
+#' selects the ERR model. Intermediate values do not blend ERR and EAR here.
+#'
+#' @param exposure List defining the exposure scenario:
+#' \itemize{
+#'   \item \code{agex}: age(s) at exposure (scalar or vector). Put the first
+#'         exposure age first, as it determines the start of the output grid.
+#'   \item \code{doseGy}: dose(s) in gray (Gy), with the same length as \code{agex}.
+#'   \item \code{sex}: \code{1} for male or \code{2} for female.
+#' }
+#'
+#' @param riskmodel List containing \code{err} and/or \code{ear}, according to
+#' the model selected by \code{option$err_wgt}. The selected component must
+#' contain \code{para} (parameter estimates) and \code{f} (a function of the
+#' parameter vector and exposure data). The function receives \code{data}
+#' with dose, age at exposure, attained age, and sex. Parameter uncertainty
+#' information such as \code{var} or \code{ci} is not used.
+#'
+#' @param option List with \code{maxage}, the last age in the output grid, and
+#' \code{err_wgt}, where \code{0} selects EAR and any other value selects ERR.
+#' This function does not calculate a weighted mixture of the models.
+#'
+#' @param per Numeric multiplier applied to the calculated risk at each age
+#' (default \code{1}). For example, \code{per = 10000} expresses an EAR per
+#' 10,000 person-years when the model's EAR is per person-year. An ERR is
+#' dimensionless before scaling.
+#'
+#' @return
+#' A data frame with \code{age} (integer attained-age labels) and \code{risk}
+#' (the sum of excess-risk contributions at that age, multiplied by \code{per}).
+#' The values are age-specific; they are not cumulative excess risks.
+#'
+#' @examples
+#' # 100 mGy distributed evenly across 15 exposure ages in a male worker
+#' exposure <- list(agex = 30:44 + 0.5, doseGy = rep(0.1/15, 15), sex = 1)
+#' riskmodel <- LSS_mortality$allsolid$L
+#'
+#' err_by_age <- Comp_Exrisk(exposure, riskmodel,
+#'                           option = list(maxage = 90, err_wgt = 1))
+#' plot(err_by_age$age, err_by_age$risk, type = "l",
+#'      xlab = "Attained age (years)", ylab = "Excess relative risk")
+#'
+#' ear_by_age <- Comp_Exrisk(exposure, riskmodel,
+#'                           option = list(maxage = 90, err_wgt = 0), per = 10000)
+#' head(ear_by_age)  # excess absolute rate per 10,000 person-years
+#'
+#' @seealso \code{\link{CER}}, \code{\link{mc_CER}}, \code{\link{LSS_mortality}}
+#' @export
+Comp_Exrisk <- function( exposure, riskmodel, option, per=1 ){
+  ages <- ceiling(exposure$agex[1]):option$maxage
+  nexp <- length(exposure$agex)
+  rm <- riskmodel$err
+  if( option$err_wgt==0 ) rm <- riskmodel$ear
+  a <- sapply(1:nexp, function(i)
+    rm$f( rm$para, data.frame(dose=exposure$doseGy[i], agex=exposure$agex[i],
+                              age=ages-0.5, sex=exposure$sex) ) )
+  b <- apply( a, 1, sum )
+  data.frame( age=ages, risk=b*per )
+}
 
 
 
